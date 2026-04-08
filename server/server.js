@@ -15,17 +15,20 @@ const { router: adminRouter } = require('./routes/admin');
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
+// Origins allowed by CORS — localhost + any explicitly configured URL
+// RENDER_EXTERNAL_URL is set automatically by Render for every web service
+const ALLOWED_ORIGINS = new Set(
+  [process.env.FRONTEND_URL, process.env.RENDER_EXTERNAL_URL].filter(Boolean)
+);
+
 // ── Middleware ─────────────────────────────────────────────
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (curl, Postman, same-origin)
-    // Allow null origin (file:// pages)
-    // Allow any localhost / 127.0.0.1 port
     if (
-      !origin ||
-      origin === 'null' ||
-      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
-      origin === (process.env.FRONTEND_URL || '')
+      !origin ||                                                          // curl / Postman / no-origin
+      origin === 'null' ||                                               // file:// pages
+      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||   // any localhost port
+      ALLOWED_ORIGINS.has(origin)                                        // configured origins
     ) {
       return callback(null, true);
     }
