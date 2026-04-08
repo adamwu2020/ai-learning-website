@@ -19,26 +19,24 @@ const { router: adminRouter } = require('./routes/admin');
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-// Origins allowed by CORS — localhost + any explicitly configured URL
-// RENDER_EXTERNAL_URL is set automatically by Render for every web service
+// Explicitly allowed origins (optional extras via env vars)
 const ALLOWED_ORIGINS = new Set(
   [process.env.FRONTEND_URL, process.env.RENDER_EXTERNAL_URL].filter(Boolean)
 );
 
 // ── Middleware ─────────────────────────────────────────────
-app.use(cors({
-  origin: function(origin, callback) {
-    if (
-      !origin ||                                                          // curl / Postman / no-origin
-      origin === 'null' ||                                               // file:// pages
-      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||   // any localhost port
-      ALLOWED_ORIGINS.has(origin)                                        // configured origins
-    ) {
-      return callback(null, true);
-    }
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
+// cors() accepts a function(req, callback) so we can access req.headers.host
+// to automatically allow same-origin requests regardless of domain/custom domain
+app.use(cors(function(req, callback) {
+  const origin = req.headers.origin;
+  const host   = req.headers.host;
+  const allowed =
+    !origin ||                                                         // curl / Postman
+    origin === 'null' ||                                              // file:// pages
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||  // any localhost port
+    ALLOWED_ORIGINS.has(origin) ||                                    // explicit list
+    (host && (origin === `https://${host}` || origin === `http://${host}`)); // same-origin (any domain)
+  callback(null, { origin: allowed, credentials: true });
 }));
 
 app.use(express.json());
