@@ -2,6 +2,10 @@
 //  AI Learning — Auth Server
 //  node server.js  (or: npm run dev)
 // ============================================================
+
+// Force IPv4 DNS — Render free tier cannot reach Supabase over IPv6
+require('dns').setDefaultResultOrder('ipv4first');
+
 require('dotenv').config();
 
 const express  = require('express');
