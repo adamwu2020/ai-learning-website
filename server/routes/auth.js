@@ -5,7 +5,7 @@ const express  = require('express');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
 const crypto   = require('crypto');
-const { db, stmts } = require('../db');
+const { db }   = require('../db');
 const { sendPasswordReset } = require('../mailer');
 
 const router = express.Router();
@@ -22,7 +22,7 @@ const TRIAL_DAYS = 7;
 
 function trialInfo(u) {
   if (!u || !u.created_at) return { trial_active: true, trial_days_left: TRIAL_DAYS };
-  const created = new Date(String(u.created_at).replace(' ', 'T') + 'Z');
+  const created = new Date(u.created_at);
   if (isNaN(created.getTime())) return { trial_active: true, trial_days_left: TRIAL_DAYS };
   const daysElapsed = (Date.now() - created.getTime()) / 86400000;
   const daysLeft = Math.max(0, Math.ceil(TRIAL_DAYS - daysElapsed));
@@ -74,13 +74,12 @@ router.post('/register',
   async (req, res) => {
     try {
       const { name, email, password } = req.body;
-      if (stmts.findByEmail.get(email.trim())) {
+      if (await db.findByEmail(email.trim())) {
         return res.status(409).json({ error: 'An account with this email already exists.' });
       }
       const hash = await bcrypt.hash(password, 12);
-      const result = stmts.createUser.run(name.trim(), email.toLowerCase().trim(), hash);
-      const user   = stmts.findById.get(result.lastInsertRowid);
-      const token  = makeToken(user.id);
+      const user = await db.createUser(name.trim(), email.toLowerCase().trim(), hash);
+      const token = makeToken(user.id);
       console.log(`✅ Registered: ${email}`);
       res.status(201).json({ token, user: safeUser(user) });
     } catch (err) {
@@ -96,14 +95,14 @@ router.post('/login',
   async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = stmts.findByEmail.get(email.trim());
+      const user = await db.findByEmail(email.trim());
       if (!user || !(await bcrypt.compare(password, user.password_hash))) {
         return res.status(401).json({ error: 'Invalid email or password.' });
       }
-      stmts.updateLastLogin.run(user.id);
+      await db.updateLastLogin(user.id);
       const token = makeToken(user.id);
       console.log(`✅ Login: ${email}`);
-      res.json({ token, user: safeUser(stmts.findById.get(user.id)) });
+      res.json({ token, user: safeUser(await db.findById(user.id)) });
     } catch (err) {
       console.error('Login error:', err);
       res.status(500).json({ error: 'Login failed. Please try again.' });
@@ -112,8 +111,8 @@ router.post('/login',
 );
 
 // ── GET /api/auth/me ───────────────────────────────────────
-router.get('/me', authMiddleware, (req, res) => {
-  const user = stmts.findById.get(req.userId);
+router.get('/me', authMiddleware, async (req, res) => {
+  const user = await db.findById(req.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
   res.json({ user: safeUser(user) });
 });
@@ -125,22 +124,20 @@ router.post('/forgot-password',
     const SUCCESS = { message: 'If an account with that email exists, a reset link has been sent.' };
     try {
       const { email } = req.body;
-      const user = stmts.findByEmail.get(email.trim());
+      const user = await db.findByEmail(email.trim());
       if (!user) return res.json(SUCCESS);   // Don't leak email existence
 
-      stmts.deleteOldResets.run(user.id);    // Invalidate previous tokens
+      await db.deleteOldResets(user.id);     // Invalidate previous tokens
 
       const token     = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000)
-        .toISOString().replace('T', ' ').slice(0, 19);
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-      stmts.insertReset.run(user.id, token, expiresAt);
+      await db.insertReset(user.id, token, expiresAt);
 
       const resetLink = `${FRONTEND}/reset-password.html?token=${token}`;
       const result    = await sendPasswordReset({ to: user.email, name: user.name, resetLink });
 
       console.log(`📧 Reset link sent to ${user.email}`);
-      // Return preview URL only in dev (no real SMTP configured)
       res.json({ ...SUCCESS, _dev_previewUrl: result.previewUrl || null });
     } catch (err) {
       console.error('Forgot-password error:', err);
@@ -150,10 +147,10 @@ router.post('/forgot-password',
 );
 
 // ── POST /api/auth/verify-reset-token ─────────────────────
-router.post('/verify-reset-token', (req, res) => {
+router.post('/verify-reset-token', async (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(400).json({ valid: false });
-  const reset = stmts.findReset.get(token);
+  const reset = await db.findReset(token);
   if (!reset) return res.json({ valid: false, error: 'This link is invalid or has expired.' });
   res.json({ valid: true, email: reset.email });
 });
@@ -164,12 +161,12 @@ router.post('/reset-password',
   async (req, res) => {
     try {
       const { token, password } = req.body;
-      const reset = stmts.findReset.get(token);
+      const reset = await db.findReset(token);
       if (!reset) return res.status(400).json({ error: 'This reset link is invalid or has expired. Please request a new one.' });
 
       const newHash = await bcrypt.hash(password, 12);
-      stmts.updatePassword.run(newHash, reset.user_id);
-      stmts.markResetUsed.run(token);
+      await db.updatePassword(newHash, reset.user_id);
+      await db.markResetUsed(token);
 
       console.log(`✅ Password reset for user ${reset.user_id}`);
       res.json({ message: 'Password updated successfully. You can now log in.' });
@@ -181,10 +178,10 @@ router.post('/reset-password',
 );
 
 // ── GET /api/auth/credits ──────────────────────────────────
-router.get('/credits', authMiddleware, (req, res) => {
-  const user = stmts.findById.get(req.userId);
+router.get('/credits', authMiddleware, async (req, res) => {
+  const user = await db.findById(req.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  const transactions = stmts.getTxHistory.all(req.userId);
+  const transactions = await db.getTxHistory(req.userId);
   res.json({
     credits: user.credits,
     subscription: user.subscription ? JSON.parse(user.subscription) : null,
@@ -193,46 +190,47 @@ router.get('/credits', authMiddleware, (req, res) => {
 });
 
 // ── POST /api/auth/credits/add ─────────────────────────────
-router.post('/credits/add', authMiddleware, (req, res) => {
+router.post('/credits/add', authMiddleware, async (req, res) => {
   const { amount, note } = req.body;
   const amt = parseInt(amount);
   if (!amt || amt <= 0 || amt > 10000) return res.status(400).json({ error: 'Invalid amount' });
 
-  stmts.updateCredits.run(amt, req.userId);
-  stmts.insertTx.run(req.userId, 'credit', amt, note || 'Credit purchase');
+  await db.updateCredits(amt, req.userId);
+  await db.insertTx(req.userId, 'credit', amt, note || 'Credit purchase');
 
-  const user = stmts.findById.get(req.userId);
+  const user = await db.findById(req.userId);
   res.json({ credits: user.credits });
 });
 
 // ── POST /api/auth/credits/deduct ─────────────────────────
-router.post('/credits/deduct', authMiddleware, (req, res) => {
+router.post('/credits/deduct', authMiddleware, async (req, res) => {
   const { amount, note } = req.body;
   const amt  = parseInt(amount);
-  const user = stmts.findById.get(req.userId);
+  const user = await db.findById(req.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
   if (user.credits < amt) return res.status(402).json({ error: 'Insufficient credits' });
 
-  stmts.updateCredits.run(-amt, req.userId);
-  stmts.insertTx.run(req.userId, 'debit', amt, note || 'Credit deduction');
+  await db.updateCredits(-amt, req.userId);
+  await db.insertTx(req.userId, 'debit', amt, note || 'Credit deduction');
 
-  res.json({ credits: stmts.findById.get(req.userId).credits });
+  const updated = await db.findById(req.userId);
+  res.json({ credits: updated.credits });
 });
 
 // ── POST /api/auth/subscription ───────────────────────────
-router.post('/subscription', authMiddleware, (req, res) => {
-  const user = stmts.findById.get(req.userId);
+router.post('/subscription', authMiddleware, async (req, res) => {
+  const user = await db.findById(req.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const expiry = new Date();
   expiry.setDate(expiry.getDate() + 30);
   const sub = { startedAt: new Date().toISOString(), expiresAt: expiry.toISOString() };
 
-  stmts.setSubscription.run(JSON.stringify(sub), user.id);
-  stmts.updateCredits.run(200, user.id);
-  stmts.insertTx.run(user.id, 'credit', 200, 'Pro Monthly subscription: 200 credits');
+  await db.setSubscription(JSON.stringify(sub), user.id);
+  await db.updateCredits(200, user.id);
+  await db.insertTx(user.id, 'credit', 200, 'Pro Monthly subscription: 200 credits');
 
-  const updated = stmts.findById.get(user.id);
+  const updated = await db.findById(user.id);
   res.json({ credits: updated.credits, subscription: sub });
 });
 
