@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learn AI — A Student's Complete Guide</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP NAVIGATION
+═══════════════════════════════════════════════════════════ -->
+<header class="topnav">
+  <div class="brand" onclick="navigate('home')">
+    <div class="brand-icon">🤖</div>
+    <div>
+      <div class="brand-name">Learn AI</div>
+      <div class="brand-sub">Student's Complete Guide</div>
+    </div>
+  </div>
+  <div class="topnav-actions">
+    <div id="topnav-trial"></div>
+    <button class="topnav-interview-btn" onclick="navigate('interview')">🎯 Mock Interview</button>
+    <div class="topnav-credit-pill" onclick="openPaymentModal()">
+      <span>💰</span>
+      <span class="credit-balance">0 credits</span>
+    </div>
+    <span class="progress-info">0/7 modules</span>
+    <div class="progress-bar-mini"><div class="progress-fill"></div></div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYOUT
+═══════════════════════════════════════════════════════════ -->
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- ═══ AUTH MODAL ═══ -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-box modal-box-auth">
+      <button class="modal-close" onclick="closeAuthModal()">✕</button>
+      <div id="authModalBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAYMENT MODAL ═══ -->
+  <div id="paymentModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closePaymentModal()">✕</button>
+      <div id="paymentModalBody"></div>
+    </div>
+  </div>
+
+  <main class="main" id="mainContent">
+
+    <!-- ═══════════════════════════════════════════════════
+         LANDING PAGE (shown when not logged in)
+    ════════════════════════════════════════════════════════ -->
+    <section id="landing" class="landing-page">
+
+      <!-- Hero -->
+      <div class="lp-hero">
+        <div class="lp-hero-inner">
+          <div class="lp-hero-badge">🎓 Practical AI Education</div>
+          <h1 class="lp-hero-title">Master AI Engineering<br><span class="lp-gradient-text">From APIs to Agents</span></h1>
+          <p class="lp-hero-sub">7 structured modules with real Python code, 350 interview Q&amp;As, and an AI-powered mock interview engine. Everything you need to go from zero to job-ready.</p>
+          <div class="lp-cta-row">
+            <button class="lp-btn-primary" onclick="openAuthModal('register')">Get Started — It's Free</button>
+            <button class="lp-btn-secondary" onclick="openAuthModal('login')">Sign In →</button>
+          </div>
+          <div class="lp-hero-stats">
+            <div class="lp-hero-stat"><div class="lp-stat-num">7</div><div class="lp-stat-label">Modules</div></div>
+            <div class="lp-stat-div"></div>
+            <div class="lp-hero-stat"><div class="lp-stat-num">350</div><div class="lp-stat-label">Q&amp;As</div></div>
+            <div class="lp-stat-div"></div>
+            <div class="lp-hero-stat"><div class="lp-stat-num">40+</div><div class="lp-stat-label">Code Examples</div></div>
+            <div class="lp-stat-div"></div>
+            <div class="lp-hero-stat"><div class="lp-stat-num">Free</div><div class="lp-stat-label">To Join</div></div>
+          </div>
+        </div>
+        <div class="lp-hero-visual">
+          <div class="lp-code-preview">
+            <div class="lp-code-dots"><span></span><span></span><span></span></div>
+            <div class="lp-code-line"><span class="lp-c-kw">from</span> openai <span class="lp-c-kw">import</span> OpenAI</div>
+            <div class="lp-code-line lp-code-blank"></div>
+            <div class="lp-code-line">client = OpenAI()</div>
+            <div class="lp-code-line lp-code-blank"></div>
+            <div class="lp-code-line">response = client.chat.completions.<span class="lp-c-fn">create</span>(</div>
+            <div class="lp-code-line lp-code-indent">model=<span class="lp-c-str">"gpt-4o"</span>,</div>
+            <div class="lp-code-line lp-code-indent">messages=[{<span class="lp-c-str">"role"</span>: <span class="lp-c-str">"user"</span>,</div>
+            <div class="lp-code-line lp-code-indent2"><span class="lp-c-str">"content"</span>: <span class="lp-c-str">"Explain RAG"</span>}]</div>
+            <div class="lp-code-line">)</div>
+            <div class="lp-code-line lp-code-blank"></div>
+            <div class="lp-code-line"><span class="lp-c-fn">print</span>(response.choices[<span class="lp-c-num">0</span>].message.content)</div>
+            <div class="lp-code-cursor"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust bar -->
+      <div class="lp-trust-bar">
+        <div class="lp-trust-inner">
+          <span class="lp-trust-item">✅ No subscription required to read</span>
+          <span class="lp-trust-sep">·</span>
+          <span class="lp-trust-item">✅ Real Python code in every module</span>
+          <span class="lp-trust-sep">·</span>
+          <span class="lp-trust-item">✅ Up-to-date with latest models</span>
+          <span class="lp-trust-sep">·</span>
+          <span class="lp-trust-item">✅ Practice with mock interviews</span>
+        </div>
+      </div>
+
+      <!-- Curriculum -->
+      <div class="lp-section">
+        <div class="lp-section-inner">
+          <div class="lp-section-label">CURRICULUM</div>
+          <h2 class="lp-section-title">A Complete AI Engineering Curriculum</h2>
+          <p class="lp-section-sub">Sign in to unlock all 7 modules and track your progress</p>
+          <div class="lp-modules-grid">
+
+            <div class="lp-module-card" style="--mc:#6366f1">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#eef2ff">🤖</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 01</div>
+              <div class="lp-mc-title">Using LLMs</div>
+              <div class="lp-mc-desc">Connect to LLM APIs, stream tokens, and control generation parameters.</div>
+              <div class="lp-mc-tags"><span>OpenAI</span><span>Anthropic</span><span>Streaming</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#06b6d4">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#ecfeff">✍️</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 02</div>
+              <div class="lp-mc-title">Prompt Engineering</div>
+              <div class="lp-mc-desc">Master chain-of-thought, self-consistency, and structured output.</div>
+              <div class="lp-mc-tags"><span>CoT</span><span>Zero-shot</span><span>JSON Output</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#f59e0b">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#fffbeb">🎯</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 03</div>
+              <div class="lp-mc-title">Few-Shot Learning</div>
+              <div class="lp-mc-desc">Teach models new tasks at inference time with curated examples.</div>
+              <div class="lp-mc-tags"><span>In-Context</span><span>Example Selection</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#10b981">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#f0fdf4">🔧</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 04</div>
+              <div class="lp-mc-title">Supervised Fine-Tuning</div>
+              <div class="lp-mc-desc">Adapt LLMs with LoRA, QLoRA, and HuggingFace Transformers.</div>
+              <div class="lp-mc-tags"><span>LoRA</span><span>QLoRA</span><span>PEFT</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#8b5cf6">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#fdf4ff">🏆</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 05</div>
+              <div class="lp-mc-title">RL with LLM-as-Judge</div>
+              <div class="lp-mc-desc">Align LLMs using PPO, DPO, and GRPO with LLM-based rewards.</div>
+              <div class="lp-mc-tags"><span>PPO</span><span>DPO</span><span>GRPO</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#ec4899">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#fdf2f8">🔍</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 06</div>
+              <div class="lp-mc-title">RAG Systems</div>
+              <div class="lp-mc-desc">Build retrieval-augmented pipelines with vector search and Graph RAG.</div>
+              <div class="lp-mc-tags"><span>Vector DB</span><span>Graph RAG</span><span>LangChain</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#ef4444">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#fef2f2">🕸️</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 07</div>
+              <div class="lp-mc-title">Agent Systems</div>
+              <div class="lp-mc-desc">Design single and multi-agent systems with tools, memory, and planning.</div>
+              <div class="lp-mc-tags"><span>ReAct</span><span>Multi-Agent</span><span>LangGraph</span></div>
+            </div>
+
+            <!-- Unlock card -->
+            <div class="lp-module-card lp-unlock-card" onclick="openAuthModal('register')">
+              <div class="lp-uc-inner">
+                <div class="lp-uc-icon">🚀</div>
+                <div class="lp-uc-title">Unlock All Modules</div>
+                <div class="lp-uc-sub">Create a free account to access everything</div>
+                <button class="lp-btn-primary" style="margin-top:16px;width:100%">Get Started Free</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div class="lp-section lp-section-dark">
+        <div class="lp-section-inner">
+          <div class="lp-section-label" style="color:#818cf8">HOW IT WORKS</div>
+          <h2 class="lp-section-title" style="color:#f1f5f9">Learn. Practice. Get Hired.</h2>
+          <div class="lp-steps">
+            <div class="lp-step">
+              <div class="lp-step-num">01</div>
+              <h3>Sign Up Free</h3>
+              <p>Create your account in seconds. No credit card required. Instant access to all 7 modules.</p>
+            </div>
+            <div class="lp-step-arrow">→</div>
+            <div class="lp-step">
+              <div class="lp-step-num">02</div>
+              <h3>Learn with Code</h3>
+              <p>Work through structured modules with real Python examples you can run immediately.</p>
+            </div>
+            <div class="lp-step-arrow">→</div>
+            <div class="lp-step">
+              <div class="lp-step-num">03</div>
+              <h3>Practice Interviews</h3>
+              <p>Test your skills with 350 AI interview questions and get instant feedback on your answers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interview feature -->
+      <div class="lp-section">
+        <div class="lp-section-inner">
+          <div class="lp-interview-feature">
+            <div class="lp-if-text">
+              <div class="lp-section-label">MOCK INTERVIEW ENGINE</div>
+              <h2 class="lp-section-title">Simulate Real AI Interviews</h2>
+              <p class="lp-section-sub" style="text-align:left">Our mock interview engine samples 10 random questions from our 350-question bank, lets you write answers, then shows model answers side by side. Rate yourself, review your history, and track improvement.</p>
+              <ul class="lp-if-bullets">
+                <li>✅ 350 questions across all 7 topics</li>
+                <li>✅ Easy / Medium / Hard difficulty filters</li>
+                <li>✅ Timer mode for realistic pressure</li>
+                <li>✅ Self-rating (1–5 stars) with history tracking</li>
+                <li>✅ Browse full Q&amp;A bank anytime</li>
+              </ul>
+              <button class="lp-btn-primary" onclick="openAuthModal('register')">Try Mock Interview</button>
+            </div>
+            <div class="lp-if-visual">
+              <div class="lp-iv-card">
+                <div class="lp-iv-header">
+                  <span class="lp-iv-tag">Medium · Module 06</span>
+                  <span class="lp-iv-progress">Q 3 / 10</span>
+                </div>
+                <div class="lp-iv-q">What is the difference between dense and sparse retrieval in RAG systems?</div>
+                <div class="lp-iv-answer-box">
+                  <div class="lp-iv-cursor">|</div>
+                </div>
+                <div class="lp-iv-footer">
+                  <div class="lp-iv-stars">⭐⭐⭐⭐☆</div>
+                  <button class="lp-iv-btn">Submit Answer →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="lp-section lp-section-alt">
+        <div class="lp-section-inner">
+          <div class="lp-section-label">PRICING</div>
+          <h2 class="lp-section-title">Simple, Transparent Pricing</h2>
+          <p class="lp-section-sub">All course content is free. Pay only for mock interview sessions.</p>
+          <div class="lp-pricing-grid">
+
+            <div class="lp-price-card">
+              <div class="lp-pc-icon">📚</div>
+              <div class="lp-pc-name">Course Content</div>
+              <div class="lp-pc-price"><span class="lp-price-big">Free</span></div>
+              <div class="lp-pc-desc">Forever</div>
+              <ul class="lp-pc-features">
+                <li>✓ All 7 modules</li>
+                <li>✓ 40+ Python code examples</li>
+                <li>✓ Architecture diagrams</li>
+                <li>✓ Progress tracking</li>
+                <li>✓ Browse Q&amp;A bank</li>
+              </ul>
+              <button class="lp-btn-outline" onclick="openAuthModal('register')">Get Started</button>
+            </div>
+
+            <div class="lp-price-card lp-price-featured">
+              <div class="lp-pc-badge">Most Popular</div>
+              <div class="lp-pc-icon">🎯</div>
+              <div class="lp-pc-name">Interview Credits</div>
+              <div class="lp-pc-price"><span class="lp-price-big">$1</span><span class="lp-price-unit">/credit</span></div>
+              <div class="lp-pc-desc">1 interview = 50 credits</div>
+              <ul class="lp-pc-features">
+                <li>✓ 10-question mock sessions</li>
+                <li>✓ Model answer comparisons</li>
+                <li>✓ Difficulty selection</li>
+                <li>✓ Session history</li>
+                <li>✓ Credits never expire</li>
+              </ul>
+              <button class="lp-btn-primary" onclick="openAuthModal('register')">Buy Credits</button>
+            </div>
+
+            <div class="lp-price-card">
+              <div class="lp-pc-icon">⚡</div>
+              <div class="lp-pc-name">Pro Monthly</div>
+              <div class="lp-pc-price"><span class="lp-price-big">$99</span><span class="lp-price-unit">/mo</span></div>
+              <div class="lp-pc-desc">200 credits · 30 days</div>
+              <ul class="lp-pc-features">
+                <li>✓ 200 credits monthly</li>
+                <li>✓ 4 mock interviews/month</li>
+                <li>✓ All free features</li>
+                <li>✓ Priority support</li>
+                <li>✓ Best value for job prep</li>
+              </ul>
+              <button class="lp-btn-outline" onclick="openAuthModal('register')">Go Pro</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Final CTA -->
+      <div class="lp-final-cta">
+        <div class="lp-section-inner" style="text-align:center">
+          <h2 style="font-size:36px;font-weight:900;color:#fff;margin-bottom:16px;letter-spacing:-0.8px">Ready to master AI engineering?</h2>
+          <p style="font-size:18px;color:rgba(255,255,255,0.75);margin-bottom:36px">Join today — it's completely free to start.</p>
+          <button class="lp-btn-primary lp-btn-lg" onclick="openAuthModal('register')">Create Free Account</button>
+          <div style="margin-top:20px;font-size:13px;color:rgba(255,255,255,0.5)">No credit card · No spam · Cancel anytime</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="lp-footer">
+        <div class="lp-footer-inner">
+          <div class="lp-footer-brand">
+            <span style="font-size:22px">🤖</span>
+            <div>
+              <div style="font-weight:700;color:#e2e8f0">Learn AI</div>
+              <div style="font-size:12px;color:#64748b">Student's Complete Guide</div>
+            </div>
+          </div>
+          <div class="lp-footer-links">
+            <button class="lp-footer-link" onclick="openAuthModal('login')">Sign In</button>
+            <button class="lp-footer-link" onclick="openAuthModal('register')">Register</button>
+          </div>
+        </div>
+      </footer>
+
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────
+         HOME PAGE (shown after login)
+    ───────────────────────────────────────────────────────── -->
+    <section id="home" class="section active">
+      <div class="hero">
+        <div class="hero-content">
+          <div class="hero-badge">🎓 Practical AI Education</div>
+          <h1>Master Modern AI,<br>From APIs to Agents</h1>
+          <p>A hands-on curriculum covering LLM usage, prompt engineering, fine-tuning, reinforcement learning, RAG, and autonomous agent systems — with real Python code examples.</p>
+          <div class="hero-stats">
+            <div><div class="hero-stat-num">7</div><div class="hero-stat-label">Modules</div></div>
+            <div><div class="hero-stat-num">40+</div><div class="hero-stat-label">Code Examples</div></div>
+            <div><div class="hero-stat-num">100%</div><div class="hero-stat-label">Free</div></div>
+          </div>
+        </div>
+      </div>
+
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:20px;letter-spacing:-0.4px;">Course Modules</h2>
+      <div class="modules-grid">
+        <div class="module-card" data-target="mod1" style="--card-accent:#6366f1; --icon-bg:#eef2ff;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🤖</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 01</div>
+              <div class="module-title">Using LLMs</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Connect to LLM APIs, send prompts, handle responses, and understand key generation parameters.</div>
+          <div class="module-tags"><span class="tag">OpenAI</span><span class="tag">Anthropic</span><span class="tag">Streaming</span><span class="tag">Parameters</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod2" style="--card-accent:#06b6d4; --icon-bg:#ecfeff;">
+          <div class="module-card-header">
+            <div class="module-card-icon">✍️</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 02</div>
+              <div class="module-title">Prompt Engineering</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Master techniques like chain-of-thought, self-consistency, and structured output to elicit better responses.</div>
+          <div class="module-tags"><span class="tag">CoT</span><span class="tag">Zero-shot</span><span class="tag">Role Prompting</span><span class="tag">JSON Output</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod3" style="--card-accent:#f59e0b; --icon-bg:#fffbeb;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🎯</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 03</div>
+              <div class="module-title">Few-Shot Learning</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Teach the model new tasks at inference time by providing curated examples in the prompt context.</div>
+          <div class="module-tags"><span class="tag">In-Context</span><span class="tag">Example Selection</span><span class="tag">Format</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod4" style="--card-accent:#10b981; --icon-bg:#f0fdf4;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🔧</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 04</div>
+              <div class="module-title">Supervised Fine-Tuning</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Adapt pre-trained LLMs to specific tasks using LoRA, QLoRA, and HuggingFace Transformers.</div>
+          <div class="module-tags"><span class="tag">LoRA</span><span class="tag">QLoRA</span><span class="tag">PEFT</span><span class="tag">HuggingFace</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod5" style="--card-accent:#8b5cf6; --icon-bg:#fdf4ff;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🏆</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 05</div>
+              <div class="module-title">RL with LLM-as-Judge</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Align LLMs using PPO, DPO, and GRPO with LLM-based reward signals instead of human labelers.</div>
+          <div class="module-tags"><span class="tag">PPO</span><span class="tag">DPO</span><span class="tag">GRPO</span><span class="tag">RLHF</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod6" style="--card-accent:#ec4899; --icon-bg:#fdf2f8;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🔍</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 06</div>
+              <div class="module-title">RAG Systems</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Build retrieval-augmented generation pipelines including vector search and knowledge graph approaches.</div>
+          <div class="module-tags"><span class="tag">Vector DB</span><span class="tag">Embeddings</span><span class="tag">Graph RAG</span><span class="tag">LangChain</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod7" style="--card-accent:#ef4444; --icon-bg:#fef2f2;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🕸️</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 07</div>
+              <div class="module-title">Agent Systems</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Design single and multi-agent systems with tool use, memory, planning, and inter-agent communication.</div>
+          <div class="module-tags"><span class="tag">ReAct</span><span class="tag">Tool Use</span><span class="tag">Multi-Agent</span><span class="tag">LangGraph</span></div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">💡</div>
+        <div><strong>How to use this course:</strong> Work through modules in order — each builds on concepts from the previous one. All code examples use Python and popular open-source libraries. Click a module card above or use the sidebar to navigate.</div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 1: USING LLMs
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod1" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#eef2ff; --badge-color:#4f46e5;">🤖 Module 01</div>
+        <h1>How to Use Large Language Models</h1>
+        <p>Learn to interact with LLM APIs programmatically — sending prompts, handling responses, streaming tokens, and controlling generation behavior with key parameters.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Call the OpenAI / Anthropic API</li>
+            <li>Understand chat message formats</li>
+            <li>Stream tokens in real-time</li>
+            <li>Tune temperature, top-p, max_tokens</li>
+            <li>Count tokens & estimate cost</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- What is an LLM -->
+      <div class="content-card">
+        <h2>🧠 What is an LLM?</h2>
+        <p>A <strong>Large Language Model (LLM)</strong> is a neural network trained on vast amounts of text data to predict the next token in a sequence. Models like GPT-4, Claude, and Llama have billions of parameters and can understand and generate human-like text.</p>
+        <p>Modern LLMs are accessed via an <strong>API</strong> — you send a structured request with your conversation history, and the model returns a completion.</p>
+
+        <div class="concepts-grid">
+          <div class="concept-item">
+            <div class="concept-title">Context Window</div>
+            <div class="concept-desc">Maximum number of tokens (input + output) the model can process at once. GPT-4 supports up to 128K tokens.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Token</div>
+            <div class="concept-desc">A chunk of text (~4 chars on average). "chatbot" = 1 token; "AI is cool" ≈ 3 tokens.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Temperature</div>
+            <div class="concept-desc">Controls randomness. 0 = deterministic, 1 = creative. Most tasks work well at 0.0–0.7.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">System Prompt</div>
+            <div class="concept-desc">A special instruction message that sets the model's role, persona, or constraints before the conversation.</div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-icon">ℹ️</div>
+          <div><strong>Popular providers:</strong> OpenAI (GPT-4o, o1), Anthropic (Claude 3.5), Google (Gemini), Meta (Llama 3), Mistral AI. They all follow a similar chat-based API pattern.</div>
+        </div>
+      </div>
+
+      <!-- Basic API Call -->
+      <div class="content-card">
+        <h2>⚡ Basic API Call</h2>
+        <p>Start by installing the SDK and making your first call. The <code>messages</code> list contains the conversation history in order.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — OpenAI</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install openai
+from openai import OpenAI
+
+client = OpenAI(api_key="sk-...")  # or set OPENAI_API_KEY env var
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "You are a helpful AI tutor."},
+        {"role": "user",   "content": "Explain what a neural network is in simple terms."}
+    ],
+    temperature=0.7,
+    max_tokens=512,
+)
+
+print(response.choices[0].message.content)
+print(f"\nTokens used: {response.usage.total_tokens}")</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Anthropic (Claude)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install anthropic
+import anthropic
+
+client = anthropic.Anthropic(api_key="sk-ant-...")
+
+message = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=512,
+    system="You are a helpful AI tutor.",
+    messages=[
+        {"role": "user", "content": "Explain what a neural network is in simple terms."}
+    ]
+)
+
+print(message.content[0].text)
+print(f"\nInput tokens: {message.usage.input_tokens}")
+print(f"Output tokens: {message.usage.output_tokens}")</code></pre>
+        </div>
+      </div>
+
+      <!-- Multi-turn Conversation -->
+      <div class="content-card">
+        <h2>💬 Multi-turn Conversations</h2>
+        <p>LLMs are stateless — each request must include the full conversation history. Maintain a <code>messages</code> list and append each turn manually.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Conversation Loop</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+messages = [{"role": "system", "content": "You are a friendly tutor."}]
+
+def chat(user_input: str) -> str:
+    messages.append({"role": "user", "content": user_input})
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        temperature=0.7,
+    )
+    reply = response.choices[0].message.content
+    messages.append({"role": "assistant", "content": reply})
+    return reply
+
+# Simulate a conversation
+print(chat("What is gradient descent?"))
+print(chat("Can you give me a real-world analogy?"))
+print(chat("How does it relate to backpropagation?"))
+
+# messages list now contains the full history
+print(f"\nConversation length: {len(messages)} messages")</code></pre>
+        </div>
+      </div>
+
+      <!-- Streaming -->
+      <div class="content-card">
+        <h2>🌊 Streaming Responses</h2>
+        <p>Streaming sends tokens to your app as they're generated, instead of waiting for the full response. This dramatically improves perceived latency for users.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Streaming</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+with client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Write a haiku about machine learning."}],
+    stream=True,
+) as stream:
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            print(delta, end="", flush=True)  # Print token by token
+    print()  # Newline at end</code></pre>
+        </div>
+      </div>
+
+      <!-- Parameters -->
+      <div class="content-card">
+        <h2>🎛️ Key Generation Parameters</h2>
+        <table class="compare-table">
+          <tr><th>Parameter</th><th>Range</th><th>Effect</th><th>Recommended</th></tr>
+          <tr><td><code>temperature</code></td><td>0.0–2.0</td><td>Higher = more random/creative output</td><td>0.0 for factual, 0.7 for creative</td></tr>
+          <tr><td><code>top_p</code></td><td>0.0–1.0</td><td>Nucleus sampling; limits vocab to top-p probability mass</td><td>0.9 (use either temp or top_p, not both)</td></tr>
+          <tr><td><code>max_tokens</code></td><td>1–model limit</td><td>Maximum output length in tokens</td><td>256–2048 for most tasks</td></tr>
+          <tr><td><code>frequency_penalty</code></td><td>-2.0–2.0</td><td>Penalizes repeating tokens that appeared frequently</td><td>0.3–0.5 to reduce repetition</td></tr>
+          <tr><td><code>presence_penalty</code></td><td>-2.0–2.0</td><td>Penalizes tokens that appeared at all (encourages new topics)</td><td>0.5–1.0 for diverse outputs</td></tr>
+          <tr><td><code>stop</code></td><td>list of strings</td><td>Stop generation when any sequence is produced</td><td><code>["###", "\n\n"]</code></td></tr>
+        </table>
+      </div>
+
+      <!-- Structured Output -->
+      <div class="content-card">
+        <h2>📋 Structured JSON Output</h2>
+        <p>Use <code>response_format</code> to guarantee valid JSON output, useful for building applications that parse model responses.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — JSON Mode</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+import json
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    response_format={"type": "json_object"},
+    messages=[
+        {"role": "system", "content": "Respond only with valid JSON."},
+        {"role": "user", "content": (
+            "Extract entities from: 'Sam Altman founded OpenAI in 2015 in San Francisco.' "
+            "Return JSON with keys: people, organizations, locations, years."
+        )},
+    ]
+)
+
+data = json.loads(response.choices[0].message.content)
+print(data)
+# {"people": ["Sam Altman"], "organizations": ["OpenAI"],
+#  "locations": ["San Francisco"], "years": [2015]}</code></pre>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="home">← Home</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod1">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod2">Prompt Engineering →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 2: PROMPT ENGINEERING
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod2" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#ecfeff; --badge-color:#0e7490;">✍️ Module 02</div>
+        <h1>Prompt Engineering</h1>
+        <p>Prompt engineering is the art of crafting inputs that reliably elicit the best possible outputs from an LLM. Small changes in phrasing can dramatically affect quality.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Apply zero-shot & role prompting</li>
+            <li>Use Chain-of-Thought reasoning</li>
+            <li>Implement self-consistency sampling</li>
+            <li>Build reusable prompt templates</li>
+            <li>Extract structured data reliably</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Taxonomy -->
+      <div class="content-card">
+        <h2>🗺️ Prompting Techniques Overview</h2>
+        <div class="diagram">
+          <div class="flow" style="flex-wrap:wrap;gap:12px;">
+            <div class="flow-box accent">Zero-shot</div>
+            <div class="flow-box blue">Few-shot</div>
+            <div class="flow-box green">Chain-of-Thought</div>
+            <div class="flow-box purple">Self-Consistency</div>
+            <div class="flow-box orange">Tree of Thought</div>
+            <div class="flow-box cyan">Role Prompting</div>
+          </div>
+          <p style="margin-top:12px;font-size:12px;color:#64748b;">Complexity & effectiveness generally increase left → right</p>
+        </div>
+      </div>
+
+      <!-- Zero-shot vs Few-shot -->
+      <div class="content-card">
+        <h2>🎯 Zero-Shot Prompting</h2>
+        <p><strong>Zero-shot</strong> prompting relies on the model's pre-trained knowledge with no examples. Works well for common tasks. The key is a clear, specific instruction.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Zero-Shot Classification</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def classify_sentiment(text: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{
+            "role": "user",
+            "content": f"""Classify the sentiment of the following text.
+Respond with exactly one word: POSITIVE, NEGATIVE, or NEUTRAL.
+
+Text: "{text}"
+
+Sentiment:"""
+        }],
+        temperature=0,  # Deterministic for classification
+        max_tokens=10,
+    )
+    return response.choices[0].message.content.strip()
+
+texts = [
+    "The model training finished 10x faster than expected!",
+    "This API keeps returning errors and I can't figure out why.",
+    "The paper proposes a new attention mechanism."
+]
+
+for t in texts:
+    print(f"'{t[:40]}...' → {classify_sentiment(t)}")</code></pre>
+        </div>
+      </div>
+
+      <!-- Chain-of-Thought -->
+      <div class="content-card">
+        <h2>🔗 Chain-of-Thought (CoT)</h2>
+        <p>CoT prompts the model to show its reasoning step-by-step before giving an answer. This dramatically improves performance on math, logic, and multi-step reasoning tasks.</p>
+
+        <div class="two-col">
+          <div>
+            <h3>❌ Without CoT</h3>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn">Copy</button></div>
+              <pre><code class="language-python">prompt = """
+Q: A train travels 150 km in 2 hours,
+then 200 km in 3 hours. What is its
+average speed for the whole trip?
+
+A:"""
+# Often gets wrong answer: 70 km/h (arithmetic mean)</code></pre>
+            </div>
+          </div>
+          <div>
+            <h3>✅ With CoT</h3>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">Prompt</span><button class="copy-btn">Copy</button></div>
+              <pre><code class="language-python">prompt = """
+Q: A train travels 150 km in 2 hours,
+then 200 km in 3 hours. What is its
+average speed for the whole trip?
+
+A: Let me think step by step.
+"""
+# Gets correct answer: 350/5 = 70 km/h
+# (total distance / total time)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Zero-Shot CoT ("Let's think step by step")</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def solve_with_cot(problem: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a careful, logical problem solver."},
+            {"role": "user", "content": f"{problem}\n\nLet's think step by step:"}
+        ],
+        temperature=0,
+    )
+    return response.choices[0].message.content
+
+problem = """
+If I have 5 apples and give away 2/5 of them, then receive 3 more,
+and finally share equally with one friend, how many do I end up with?
+"""
+print(solve_with_cot(problem))</code></pre>
+        </div>
+      </div>
+
+      <!-- Self-Consistency -->
+      <div class="content-card">
+        <h2>♻️ Self-Consistency</h2>
+        <p>Generate multiple CoT responses with high temperature, then take the majority vote. This ensemble approach reduces errors by ~10-20% on reasoning tasks.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Self-Consistency Voting</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+from collections import Counter
+import re
+
+client = OpenAI()
+
+def self_consistency(question: str, num_samples: int = 5) -> str:
+    """Sample multiple CoT paths and majority-vote the final answer."""
+    system = (
+        "Solve the problem step by step. "
+        "End your response with 'Final answer: <answer>'"
+    )
+    answers = []
+    for _ in range(num_samples):
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": question}
+            ],
+            temperature=0.8,  # High temp for diverse reasoning paths
+        )
+        text = resp.choices[0].message.content
+        # Extract the final answer
+        match = re.search(r"Final answer:\s*(.+)", text, re.IGNORECASE)
+        if match:
+            answers.append(match.group(1).strip().lower())
+
+    if not answers:
+        return "Could not extract answers"
+
+    # Majority vote
+    most_common, count = Counter(answers).most_common(1)[0]
+    print(f"Votes: {dict(Counter(answers))}")
+    print(f"Majority ({count}/{num_samples}): {most_common}")
+    return most_common
+
+result = self_consistency(
+    "A bat and ball cost $1.10 total. The bat costs $1.00 more than the ball. "
+    "How much does the ball cost?"
+)</code></pre>
+        </div>
+      </div>
+
+      <!-- Role Prompting -->
+      <div class="content-card">
+        <h2>🎭 Role Prompting</h2>
+        <p>Assigning a specific role or persona in the system prompt activates relevant knowledge patterns and adjusts the model's communication style.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Role-Based System Prompts</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+ROLES = {
+    "code_reviewer": """You are a senior software engineer with 15 years of experience.
+Review code for: correctness, performance, security vulnerabilities, and maintainability.
+Be specific and actionable in your feedback.""",
+
+    "socratic_tutor": """You are a Socratic tutor. Never give direct answers.
+Instead, guide students to discover answers themselves through carefully crafted questions.
+Ask one question at a time.""",
+
+    "ux_critic": """You are a UX researcher with expertise in cognitive load theory.
+Evaluate designs from the user's perspective. Cite specific usability heuristics.""",
+}
+
+def ask_expert(role_key: str, question: str) -> str:
+    return client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": ROLES[role_key]},
+            {"role": "user",   "content": question}
+        ],
+        temperature=0.7,
+    ).choices[0].message.content
+
+# Example usage
+review = ask_expert("code_reviewer", """
+Review this Python function:
+def get_user(id):
+    return db.execute(f"SELECT * FROM users WHERE id = {id}")
+""")</code></pre>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠️</div>
+          <div>The code above has a SQL injection vulnerability — that's intentional so the code reviewer can catch it! Always use parameterized queries: <code>db.execute("SELECT * FROM users WHERE id = ?", (id,))</code></div>
+        </div>
+      </div>
+
+      <!-- Prompt Templates -->
+      <div class="content-card">
+        <h2>📝 Reusable Prompt Templates</h2>
+        <p>Build parameterized templates to standardize prompts across your application and make them easier to iterate on.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Template System</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from string import Template
+from openai import OpenAI
+
+client = OpenAI()
+
+# Define reusable templates
+SUMMARIZE_TEMPLATE = Template("""
+You are an expert at summarizing $domain content.
+Summarize the following text in exactly $num_points bullet points.
+Focus on: $focus_areas.
+Each bullet should be one clear, concise sentence.
+
+TEXT:
+$text
+
+SUMMARY:
+""")
+
+EXTRACT_TEMPLATE = Template("""
+Extract all $entity_type from the following text.
+Return as a JSON array of strings.
+If none found, return an empty array [].
+
+TEXT: $text
+""")
+
+def summarize(text: str, domain="technical", points=3, focus="key findings"):
+    prompt = SUMMARIZE_TEMPLATE.substitute(
+        domain=domain,
+        num_points=points,
+        focus_areas=focus,
+        text=text
+    )
+    return client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+    ).choices[0].message.content
+
+paper_abstract = """
+We present GPT-4, a large multimodal model capable of processing image and text inputs
+and producing text outputs. GPT-4 exhibits human-level performance on various professional
+and academic benchmarks...
+"""
+print(summarize(paper_abstract, domain="AI research", points=4, focus="contributions, methods, results"))</code></pre>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod1">← Using LLMs</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod2">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod3">Few-Shot Learning →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 3: FEW-SHOT LEARNING
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod3" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#fffbeb; --badge-color:#b45309;">🎯 Module 03</div>
+        <h1>Few-Shot Learning</h1>
+        <p>Few-shot learning uses a small number of examples (shots) within the prompt to teach the model a new task without any gradient updates — this is called <em>in-context learning</em>.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Understand in-context learning</li>
+            <li>Format examples effectively</li>
+            <li>Select high-quality shots</li>
+            <li>Build dynamic few-shot retrieval</li>
+            <li>Know when few-shot beats zero-shot</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Concept -->
+      <div class="content-card">
+        <h2>🧠 How In-Context Learning Works</h2>
+        <p>Large language models develop the ability to learn new tasks by observing demonstrations in their context window. No weight updates occur — the model uses <strong>pattern matching and analogy</strong> from its pre-training.</p>
+
+        <div class="arch-diagram">
+          <div class="arch-row">
+            <div class="arch-box user" style="min-width:420px;text-align:left;font-weight:400;font-size:12px;padding:12px 16px;">
+              <strong style="display:block;margin-bottom:6px;">Prompt Structure</strong>
+              <div style="color:#475569;font-family:monospace;">
+                [System: You are a sentiment classifier]<br>
+                Text: "Great product!" → Label: POSITIVE<br>
+                Text: "Terrible experience." → Label: NEGATIVE<br>
+                Text: "It works fine." → Label: NEUTRAL<br>
+                <span style="color:#1d4ed8;font-weight:700;">Text: "Loved it!" → Label: ???</span>
+              </div>
+            </div>
+          </div>
+          <div class="arch-row" style="margin-top:8px">
+            <span style="font-size:13px;color:#64748b;">3 examples (shots) teach the format → model predicts POSITIVE</span>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">🔮</div>
+          <div><strong>Why it works:</strong> During pre-training on internet text, the model sees countless input→output patterns. Few-shot examples activate the right "circuit" for the task by providing clear format and semantics cues.</div>
+        </div>
+      </div>
+
+      <!-- Basic Few-shot -->
+      <div class="content-card">
+        <h2>📋 Basic Few-Shot Format</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Few-Shot Classification</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def few_shot_classify(examples: list[dict], query: str) -> str:
+    """
+    examples: list of {"input": ..., "label": ...}
+    query: the text to classify
+    """
+    # Build the few-shot prompt
+    shots = "\n".join([
+        f'Text: "{ex["input"]}"\nLabel: {ex["label"]}'
+        for ex in examples
+    ])
+
+    prompt = f"""Classify the sentiment of text as POSITIVE, NEGATIVE, or NEUTRAL.
+
+{shots}
+Text: "{query}"
+Label:"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+        max_tokens=10,
+    )
+    return response.choices[0].message.content.strip()
+
+# Examples covering all three classes
+examples = [
+    {"input": "The delivery was incredibly fast!", "label": "POSITIVE"},
+    {"input": "Completely broken on arrival.",      "label": "NEGATIVE"},
+    {"input": "It does what it says.",              "label": "NEUTRAL"},
+    {"input": "Best purchase I've made this year!", "label": "POSITIVE"},
+    {"input": "Won't be buying from them again.",   "label": "NEGATIVE"},
+]
+
+queries = [
+    "Works as expected, nothing special.",
+    "Absolutely love this product!",
+    "Stopped working after one week."
+]
+
+for q in queries:
+    label = few_shot_classify(examples, q)
+    print(f"'{q}' → {label}")</code></pre>
+        </div>
+      </div>
+
+      <!-- Dynamic Few-shot -->
+      <div class="content-card">
+        <h2>🔄 Dynamic Example Selection</h2>
+        <p>Instead of using fixed examples, retrieve the most <strong>semantically similar</strong> examples to the query. This improves performance especially for diverse or edge-case inputs.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Semantic Example Retrieval</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install openai numpy
+from openai import OpenAI
+import numpy as np
+
+client = OpenAI()
+
+def get_embedding(text: str) -> list[float]:
+    resp = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text
+    )
+    return resp.data[0].embedding
+
+def cosine_similarity(a, b) -> float:
+    a, b = np.array(a), np.array(b)
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+class DynamicFewShot:
+    def __init__(self, examples: list[dict]):
+        """examples: list of {"input": ..., "output": ..., "embedding": None}"""
+        self.examples = examples
+        # Pre-compute embeddings for all examples
+        for ex in self.examples:
+            ex["embedding"] = get_embedding(ex["input"])
+
+    def get_top_k(self, query: str, k: int = 3) -> list[dict]:
+        q_emb = get_embedding(query)
+        scored = [
+            (cosine_similarity(q_emb, ex["embedding"]), ex)
+            for ex in self.examples
+        ]
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [ex for _, ex in scored[:k]]
+
+    def predict(self, query: str, k: int = 3) -> str:
+        top_k = self.get_top_k(query, k)
+        shots = "\n".join([
+            f'Input: {ex["input"]}\nOutput: {ex["output"]}'
+            for ex in top_k
+        ])
+        prompt = f"Transform the input as shown:\n\n{shots}\nInput: {query}\nOutput:"
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+        )
+        return resp.choices[0].message.content.strip()
+
+# Example: date format normalization
+examples = [
+    {"input": "January 5th, 2024",     "output": "2024-01-05"},
+    {"input": "March 22, 2023",        "output": "2023-03-22"},
+    {"input": "Dec 31st 2022",         "output": "2022-12-31"},
+    {"input": "15 August 2024",        "output": "2024-08-15"},
+    {"input": "July 4, 2025",          "output": "2025-07-04"},
+    {"input": "February 14th, 2024",   "output": "2024-02-14"},
+]
+
+dfs = DynamicFewShot(examples)
+print(dfs.predict("October 3rd, 2024"))   # → 2024-10-03
+print(dfs.predict("11 November 2025"))    # → 2025-11-11</code></pre>
+        </div>
+      </div>
+
+      <!-- Best Practices -->
+      <div class="content-card">
+        <h2>✅ Best Practices</h2>
+        <table class="compare-table">
+          <tr><th>Principle</th><th>Do</th><th>Avoid</th></tr>
+          <tr>
+            <td><strong>Diversity</strong></td>
+            <td>Cover all output classes/formats in examples</td>
+            <td>Using examples that are all similar to each other</td>
+          </tr>
+          <tr>
+            <td><strong>Format</strong></td>
+            <td>Use identical I/O format for all shots</td>
+            <td>Inconsistent spacing, punctuation, or structure</td>
+          </tr>
+          <tr>
+            <td><strong>Quality</strong></td>
+            <td>Use high-quality, verified example pairs</td>
+            <td>Incorrect labels — they anchor the model to wrong patterns</td>
+          </tr>
+          <tr>
+            <td><strong>Order</strong></td>
+            <td>Put the most relevant example last (recency bias)</td>
+            <td>Random ordering for critical tasks</td>
+          </tr>
+          <tr>
+            <td><strong>Count</strong></td>
+            <td>3–8 shots for most tasks</td>
+            <td>Filling the entire context window with shots</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod2">← Prompt Engineering</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod3">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod4">Fine-Tuning →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 4: SUPERVISED FINE-TUNING
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod4" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#f0fdf4; --badge-color:#166534;">🔧 Module 04</div>
+        <h1>Supervised Fine-Tuning (SFT)</h1>
+        <p>SFT adapts a pre-trained LLM to a specific domain or task by training on labeled instruction-response pairs, updating model weights using gradient descent.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Prepare instruction-tuning datasets</li>
+            <li>Understand LoRA / QLoRA</li>
+            <li>Run training with HuggingFace + TRL</li>
+            <li>Choose hyperparameters</li>
+            <li>Evaluate fine-tuned models</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Why SFT -->
+      <div class="content-card">
+        <h2>🤔 Why Fine-Tune?</h2>
+        <p>Prompt engineering has limits. When you need consistent format/style, domain-specific knowledge, lower latency, or lower API cost, fine-tuning is the answer.</p>
+        <table class="compare-table">
+          <tr><th>Approach</th><th>When to Use</th><th>Trade-offs</th></tr>
+          <tr><td>Prompting</td><td>General tasks, quick iteration</td><td>High token cost, inconsistent format</td></tr>
+          <tr><td>Few-Shot</td><td>Format adaptation</td><td>Uses context window, can't go below 3-5 shots</td></tr>
+          <tr><td><strong>SFT</strong></td><td>Domain expertise, consistent behavior</td><td>Needs data & compute, risks overfitting</td></tr>
+        </table>
+      </div>
+
+      <!-- Data Format -->
+      <div class="content-card">
+        <h2>📦 Data Preparation</h2>
+        <p>SFT requires a dataset of <strong>(instruction, response)</strong> pairs in a chat format. Quality matters far more than quantity — 1,000 excellent examples beat 100,000 mediocre ones.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Dataset Preparation (ShareGPT format)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">import json
+from datasets import Dataset
+
+# ShareGPT format (widely supported)
+data = [
+    {
+        "conversations": [
+            {"from": "system",    "value": "You are an expert Python tutor."},
+            {"from": "human",     "value": "How do I read a CSV file in Python?"},
+            {"from": "gpt",       "value": "Use the `csv` module or pandas:\n\n```python\nimport pandas as pd\ndf = pd.read_csv('file.csv')\nprint(df.head())\n```\n\nFor large files, use `chunksize=1000` to process in batches."}
+        ]
+    },
+    {
+        "conversations": [
+            {"from": "system",    "value": "You are an expert Python tutor."},
+            {"from": "human",     "value": "What is a list comprehension?"},
+            {"from": "gpt",       "value": "A list comprehension is a concise way to create lists:\n\n```python\n# Traditional\nresult = []\nfor x in range(10):\n    if x % 2 == 0:\n        result.append(x**2)\n\n# List comprehension\nresult = [x**2 for x in range(10) if x % 2 == 0]\n```\n\nThey're faster and more Pythonic than equivalent loops."}
+        ]
+    },
+    # ... add thousands more examples
+]
+
+# Save as JSONL
+with open("train.jsonl", "w") as f:
+    for item in data:
+        f.write(json.dumps(item) + "\n")
+
+# Load with HuggingFace datasets
+dataset = Dataset.from_list(data)
+dataset = dataset.train_test_split(test_size=0.05)
+print(f"Train: {len(dataset['train'])}, Val: {len(dataset['test'])}")</code></pre>
+        </div>
+      </div>
+
+      <!-- LoRA Explanation -->
+      <div class="content-card">
+        <h2>⚡ LoRA: Low-Rank Adaptation</h2>
+        <p>Full fine-tuning updates all ~7B+ parameters — expensive and prone to catastrophic forgetting. <strong>LoRA</strong> freezes the original weights and injects small trainable matrices that capture task-specific updates.</p>
+
+        <div class="arch-diagram">
+          <div class="arch-row">
+            <div class="arch-box llm" style="padding:16px 24px;">
+              <div style="font-size:12px;font-weight:400;color:#6b7280;">Original Weight W</div>
+              <div style="font-size:20px;margin:4px 0;">W<sub>0</sub></div>
+              <div style="font-size:11px;color:#7e22ce;">FROZEN ❄️</div>
+            </div>
+            <div style="font-size:22px;margin:0 8px;color:#64748b;">+</div>
+            <div class="arch-box embed" style="padding:16px 24px;">
+              <div style="font-size:12px;font-weight:400;color:#6b7280;">LoRA Adapter</div>
+              <div style="font-size:20px;margin:4px 0;">B·A</div>
+              <div style="font-size:11px;color:#9a3412;">TRAINABLE 🔥</div>
+            </div>
+            <div style="font-size:22px;margin:0 8px;color:#64748b;">=</div>
+            <div class="arch-box green" style="padding:16px 24px;">
+              <div style="font-size:12px;font-weight:400;color:#166534;">Effective Weight</div>
+              <div style="font-size:20px;margin:4px 0;">W<sub>0</sub> + BA</div>
+              <div style="font-size:11px;color:#166534;">~1% parameters</div>
+            </div>
+          </div>
+          <p style="margin-top:12px;font-size:12.5px;color:#64748b;">A is rank×d, B is d×rank. Typical rank=8–64. Only A and B are trained.</p>
+        </div>
+
+        <div class="concepts-grid">
+          <div class="concept-item">
+            <div class="concept-title">LoRA rank (r)</div>
+            <div class="concept-desc">Higher rank = more capacity but more parameters. r=8 for simple tasks, r=64 for complex ones.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Alpha (α)</div>
+            <div class="concept-desc">Scaling factor = α/r. Keep α = 2×r for stable training (e.g., r=16, α=32).</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Target modules</div>
+            <div class="concept-desc">Which attention layers to apply LoRA to: q_proj, v_proj (at minimum), or all projection layers.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">QLoRA</div>
+            <div class="concept-desc">Quantize base model to 4-bit (NF4), then apply LoRA. Fits 70B models on a single consumer GPU.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Code -->
+      <div class="content-card">
+        <h2>🚀 Training with TRL + PEFT</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — SFT Training (TRL SFTTrainer)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install transformers trl peft accelerate bitsandbytes datasets
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import LoraConfig, get_peft_model, TaskType
+from trl import SFTTrainer, SFTConfig
+from datasets import load_dataset
+import torch
+
+MODEL_ID = "meta-llama/Meta-Llama-3.1-8B"
+
+# ── 4-bit Quantization (QLoRA) ──────────────────────────
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_ID,
+    quantization_config=bnb_config,
+    device_map="auto",
+    torch_dtype=torch.bfloat16,
+)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+tokenizer.pad_token = tokenizer.eos_token
+
+# ── LoRA Configuration ───────────────────────────────────
+lora_config = LoraConfig(
+    r=16,                           # Rank
+    lora_alpha=32,                  # Alpha = 2x rank
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                    "gate_proj", "up_proj", "down_proj"],
+    lora_dropout=0.05,
+    bias="none",
+    task_type=TaskType.CAUSAL_LM,
+)
+
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()
+# trainable params: 83,886,080 || all params: 8,114,278,400 || trainable%: 1.03%
+
+# ── Training Arguments ───────────────────────────────────
+training_args = SFTConfig(
+    output_dir="./llama3-sft",
+    num_train_epochs=3,
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=4,    # Effective batch = 8
+    learning_rate=2e-4,
+    warmup_ratio=0.03,
+    lr_scheduler_type="cosine",
+    logging_steps=10,
+    save_steps=100,
+    eval_strategy="steps",
+    eval_steps=100,
+    bf16=True,
+    max_seq_length=2048,
+    dataset_text_field="text",        # Column containing formatted text
+    report_to="wandb",                # Optional: experiment tracking
+)
+
+# ── Load Dataset ─────────────────────────────────────────
+dataset = load_dataset("json", data_files={"train": "train.jsonl"}, split="train")
+
+def format_conversation(example):
+    """Convert ShareGPT format to training text."""
+    messages = example["conversations"]
+    text = ""
+    for msg in messages:
+        if msg["from"] == "system":
+            text += f"<|system|>\n{msg['value']}\n"
+        elif msg["from"] == "human":
+            text += f"<|user|>\n{msg['value']}\n"
+        elif msg["from"] == "gpt":
+            text += f"<|assistant|>\n{msg['value']}\n"
+    return {"text": text}
+
+dataset = dataset.map(format_conversation)
+
+# ── Start Training ───────────────────────────────────────
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    tokenizer=tokenizer,
+)
+
+trainer.train()
+trainer.save_model("./llama3-sft-final")
+print("Training complete!")</code></pre>
+        </div>
+      </div>
+
+      <!-- Merging and Inference -->
+      <div class="content-card">
+        <h2>🔗 Merging LoRA Weights & Inference</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Merge & Run Inference</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+import torch
+
+BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B"
+LORA_ADAPTER = "./llama3-sft-final"
+
+# Load base model in full precision for merging
+base_model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL, torch_dtype=torch.bfloat16, device_map="auto"
+)
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+
+# Load and merge LoRA weights into base model
+model = PeftModel.from_pretrained(base_model, LORA_ADAPTER)
+model = model.merge_and_unload()  # Merge weights, remove LoRA modules
+
+# Save merged model
+model.save_pretrained("./llama3-merged")
+tokenizer.save_pretrained("./llama3-merged")
+
+# Run inference
+pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
+prompt = "<|system|>\nYou are an expert Python tutor.\n<|user|>\nExplain decorators.\n<|assistant|>\n"
+output = pipe(prompt, max_new_tokens=256, temperature=0.7)
+print(output[0]["generated_text"][len(prompt):])</code></pre>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod3">← Few-Shot Learning</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod4">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod5">RL Training →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 5: RL WITH LLM-AS-JUDGE
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod5" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#fdf4ff; --badge-color:#6b21a8;">🏆 Module 05</div>
+        <h1>RL Training with LLM-as-Judge</h1>
+        <p>Reinforcement Learning from Human Feedback (RLHF) aligns LLMs with human preferences. Using another LLM as a judge automates the reward signal at scale — no human labelers needed.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Understand RLHF pipeline</li>
+            <li>Implement PPO for LLMs</li>
+            <li>Apply DPO (simpler alternative)</li>
+            <li>Use GRPO for reasoning tasks</li>
+            <li>Build an LLM-as-judge reward model</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RLHF Overview -->
+      <div class="content-card">
+        <h2>🗺️ RLHF Overview</h2>
+        <p>Classic RLHF has three stages. Using an LLM-as-judge replaces the expensive human preference collection step.</p>
+        <div class="arch-diagram">
+          <div class="arch-label">Stage 1 — Supervised Fine-Tuning</div>
+          <div class="arch-row">
+            <div class="arch-box user">Instruction Data</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box llm">SFT on Base LLM</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box green">SFT Model (Policy)</div>
+          </div>
+          <div class="arch-separator"></div>
+          <div class="arch-label">Stage 2 — Reward Modeling</div>
+          <div class="arch-row">
+            <div class="arch-box user">Prompt</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box llm">LLM Judge</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box memory">Reward Score</div>
+          </div>
+          <div class="arch-separator"></div>
+          <div class="arch-label">Stage 3 — RL Optimization (PPO / DPO / GRPO)</div>
+          <div class="arch-row">
+            <div class="arch-box green">SFT Policy</div>
+            <span class="flow-arrow">+</span>
+            <div class="arch-box memory">Reward</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box llm">RL Update</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box embed">Aligned Model</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LLM as Judge -->
+      <div class="content-card">
+        <h2>⚖️ LLM-as-Judge Reward Model</h2>
+        <p>Instead of a trained reward model, use a capable LLM (e.g., GPT-4o) to score responses. This scales instantly and can evaluate nuanced qualities like helpfulness and harmlessness.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — LLM Judge Implementation</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+import json
+
+client = OpenAI()
+
+JUDGE_SYSTEM = """You are an expert AI judge evaluating the quality of AI assistant responses.
+Score the response on a scale of 1-10 based on:
+- Accuracy (is the information correct?)
+- Helpfulness (does it fully address the question?)
+- Clarity (is it easy to understand?)
+- Safety (no harmful content?)
+
+Respond with valid JSON only: {"score": <1-10>, "reasoning": "<brief explanation>"}"""
+
+def llm_judge(prompt: str, response: str) -> dict:
+    """Score a response using GPT-4o as judge. Returns score and reasoning."""
+    result = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": JUDGE_SYSTEM},
+            {"role": "user", "content": f"Prompt: {prompt}\n\nResponse: {response}"}
+        ],
+        response_format={"type": "json_object"},
+        temperature=0,
+    )
+    return json.loads(result.choices[0].message.content)
+
+# Pairwise comparison (preferred for DPO data collection)
+def pairwise_judge(prompt: str, response_a: str, response_b: str) -> str:
+    """Returns 'A', 'B', or 'tie'."""
+    pairwise_prompt = f"""Which response is better?
+Prompt: {prompt}
+
+Response A: {response_a}
+
+Response B: {response_b}
+
+Answer with JSON: {{"winner": "A" | "B" | "tie", "reasoning": "..."}}"""
+
+    result = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are an impartial AI judge."},
+            {"role": "user",   "content": pairwise_prompt}
+        ],
+        response_format={"type": "json_object"},
+        temperature=0,
+    )
+    data = json.loads(result.choices[0].message.content)
+    return data["winner"]
+
+# Example usage
+score = llm_judge(
+    prompt="What is the capital of France?",
+    response="Paris is the capital of France, known for the Eiffel Tower."
+)
+print(f"Score: {score['score']}/10 — {score['reasoning']}")</code></pre>
+        </div>
+      </div>
+
+      <!-- PPO -->
+      <div class="content-card">
+        <h2>📐 PPO — Proximal Policy Optimization</h2>
+        <p>PPO is the canonical RL algorithm for RLHF. It updates the policy (LLM) to maximize reward while staying close to the reference policy via a KL divergence penalty.</p>
+
+        <div class="callout info">
+          <div class="callout-icon">📚</div>
+          <div><strong>Loss function:</strong> L = E[min(r·A, clip(r, 1-ε, 1+ε)·A)] − β·KL(π_θ ∥ π_ref)<br/>where r = π_θ(a|s)/π_ref(a|s) is the probability ratio, A is advantage, β controls KL penalty.</div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — PPO with TRL</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install trl transformers peft
+from trl import PPOConfig, PPOTrainer, AutoModelForCausalLMWithValueHead
+from transformers import AutoTokenizer
+from datasets import Dataset
+import torch
+
+MODEL_ID = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+
+# Load model with value head (needed for PPO)
+model = AutoModelForCausalLMWithValueHead.from_pretrained(
+    MODEL_ID,
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+)
+ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(
+    MODEL_ID,
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+)  # Reference model (frozen)
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+tokenizer.pad_token = tokenizer.eos_token
+
+# PPO Config
+ppo_config = PPOConfig(
+    model_name=MODEL_ID,
+    learning_rate=1.41e-5,
+    batch_size=16,
+    mini_batch_size=4,
+    gradient_accumulation_steps=1,
+    optimize_cuda_cache=True,
+    kl_penalty="kl",        # Or "full" for full KL
+    init_kl_coef=0.2,       # β: initial KL coefficient
+    target_kl=6.0,          # Target KL divergence
+    gamma=1.0,
+    lam=0.95,               # GAE lambda
+    cliprange=0.2,          # ε: clip range
+    vf_coef=0.1,            # Value function coefficient
+)
+
+trainer = PPOTrainer(
+    config=ppo_config,
+    model=model,
+    ref_model=ref_model,
+    tokenizer=tokenizer,
+)
+
+# Training loop
+prompts = ["Explain quantum computing", "Write a poem about AI", ...]
+
+for epoch in range(3):
+    for batch_prompts in chunks(prompts, ppo_config.batch_size):
+        # 1. Tokenize prompts
+        query_tensors = [
+            tokenizer.encode(p, return_tensors="pt").squeeze()
+            for p in batch_prompts
+        ]
+
+        # 2. Generate responses
+        response_tensors = trainer.generate(
+            query_tensors,
+            max_new_tokens=256,
+            temperature=0.9,
+        )
+
+        # 3. Score with LLM judge
+        rewards = []
+        for prompt, response_tensor in zip(batch_prompts, response_tensors):
+            response_text = tokenizer.decode(response_tensor)
+            score = llm_judge(prompt, response_text)  # From previous code
+            rewards.append(torch.tensor(score["score"] / 10.0))
+
+        # 4. PPO update
+        stats = trainer.step(query_tensors, response_tensors, rewards)
+        print(f"Epoch {epoch} | Mean reward: {stats['ppo/mean_scores']:.3f} | KL: {stats['objective/kl']:.3f}")</code></pre>
+        </div>
+      </div>
+
+      <!-- DPO -->
+      <div class="content-card">
+        <h2>🎯 DPO — Direct Preference Optimization</h2>
+        <p>DPO eliminates the separate reward model and RL loop entirely. It directly optimizes the policy to prefer "chosen" responses over "rejected" ones using a simple cross-entropy loss.</p>
+
+        <div class="callout success">
+          <div class="callout-icon">✅</div>
+          <div><strong>DPO advantage:</strong> Much simpler than PPO — no value head, no separate reward model, no on-policy generation during training. Just a supervised loss on preference pairs.</div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — DPO Dataset + Training</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from trl import DPOConfig, DPOTrainer
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from datasets import Dataset
+import torch
+
+MODEL_ID = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_ID, torch_dtype=torch.bfloat16, device_map="auto"
+)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+tokenizer.pad_token = tokenizer.eos_token
+
+# DPO requires preference pairs: (prompt, chosen, rejected)
+# Generate these using LLM judge for pairwise comparison
+dpo_data = [
+    {
+        "prompt":   "What is the best way to learn Python?",
+        "chosen":   "Start with official tutorials, then build projects. Practice daily with small scripts before attempting large projects.",
+        "rejected": "Just watch YouTube videos."
+    },
+    {
+        "prompt":   "Explain recursion",
+        "chosen":   "Recursion is when a function calls itself. Example: factorial(n) = n * factorial(n-1). Every recursive function needs a base case to stop.",
+        "rejected": "It's a programming thing where functions call themselves."
+    },
+    # ... thousands more preference pairs
+]
+
+dataset = Dataset.from_list(dpo_data)
+
+training_args = DPOConfig(
+    output_dir="./llama3-dpo",
+    num_train_epochs=3,
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=4,
+    learning_rate=5e-7,             # Lower than SFT
+    beta=0.1,                       # KL penalty (higher = closer to reference)
+    max_length=1024,
+    max_prompt_length=512,
+    bf16=True,
+    logging_steps=10,
+)
+
+trainer = DPOTrainer(
+    model=model,
+    ref_model=None,         # If None, uses a copy of model as reference
+    args=training_args,
+    train_dataset=dataset,
+    tokenizer=tokenizer,
+)
+
+trainer.train()
+trainer.save_model("./llama3-dpo-final")</code></pre>
+        </div>
+      </div>
+
+      <!-- GRPO -->
+      <div class="content-card">
+        <h2>🔄 GRPO — Group Relative Policy Optimization</h2>
+        <p>GRPO (from DeepSeek-R1) improves on PPO for reasoning tasks. It samples a group of responses per prompt, computes relative rewards within the group, and uses them as baselines — eliminating the value function entirely.</p>
+
+        <div class="callout tip">
+          <div class="callout-icon">💡</div>
+          <div><strong>Key insight:</strong> Instead of learning a value function V(s), GRPO estimates the baseline by averaging rewards across G sampled outputs for the same prompt. This is simpler and works extremely well for verifiable tasks (math, code).</div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — GRPO with TRL</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from trl import GRPOConfig, GRPOTrainer
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from datasets import load_dataset
+import re, torch
+
+MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"
+
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_ID, torch_dtype=torch.bfloat16, device_map="auto"
+)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+
+# ── Reward Functions ─────────────────────────────────────
+# GRPO supports multiple composable reward functions
+
+def correctness_reward(completions, ground_truth, **kwargs) -> list[float]:
+    """Verify math answers against ground truth."""
+    rewards = []
+    for completion, gt in zip(completions, ground_truth):
+        # Extract answer from <answer>...</answer> tags
+        match = re.search(r"<answer>(.*?)</answer>", completion, re.DOTALL)
+        if match and match.group(1).strip() == str(gt).strip():
+            rewards.append(2.0)   # Correct answer
+        else:
+            rewards.append(0.0)   # Wrong
+    return rewards
+
+def format_reward(completions, **kwargs) -> list[float]:
+    """Reward responses that use the correct format."""
+    rewards = []
+    for c in completions:
+        has_thinking = "<thinking>" in c and "</thinking>" in c
+        has_answer   = "<answer>" in c and "</answer>" in c
+        rewards.append(0.5 if (has_thinking and has_answer) else 0.0)
+    return rewards
+
+def length_penalty(completions, **kwargs) -> list[float]:
+    """Penalize overly short or long responses."""
+    rewards = []
+    for c in completions:
+        tokens = len(c.split())
+        if 50 <= tokens <= 500:
+            rewards.append(0.1)
+        elif tokens < 20 or tokens > 1000:
+            rewards.append(-0.2)
+        else:
+            rewards.append(0.0)
+    return rewards
+
+# ── GRPO Config ──────────────────────────────────────────
+config = GRPOConfig(
+    output_dir="./qwen-grpo-math",
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=2,
+    learning_rate=1e-6,
+    num_generations=8,              # G: responses sampled per prompt
+    max_prompt_length=512,
+    max_completion_length=1024,
+    beta=0.04,                      # KL coefficient
+    bf16=True,
+    logging_steps=10,
+    reward_weights=[1.0, 0.5, 0.2], # Weights for reward functions
+)
+
+# Load math dataset (e.g., GSM8K)
+dataset = load_dataset("openai/gsm8k", "main", split="train")
+dataset = dataset.rename_column("answer", "ground_truth")
+
+trainer = GRPOTrainer(
+    model=model,
+    tokenizer=tokenizer,
+    config=config,
+    train_dataset=dataset,
+    reward_funcs=[correctness_reward, format_reward, length_penalty],
+)
+
+trainer.train()</code></pre>
+        </div>
+
+        <table class="compare-table" style="margin-top:16px">
+          <tr><th>Algorithm</th><th>Requires</th><th>Best For</th><th>Complexity</th></tr>
+          <tr><td><span class="badge-purple">PPO</span></td><td>Reward model + value head</td><td>General alignment, chat</td><td>High</td></tr>
+          <tr><td><span class="badge-blue">DPO</span></td><td>Preference pairs</td><td>Style/safety alignment</td><td>Low</td></tr>
+          <tr><td><span class="badge-green">GRPO</span></td><td>Verifiable reward function</td><td>Math, code, reasoning</td><td>Medium</td></tr>
+        </table>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod4">← Fine-Tuning</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod5">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod6">RAG Systems →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 6: RAG SYSTEMS
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod6" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#fdf2f8; --badge-color:#9d174d;">🔍 Module 06</div>
+        <h1>Retrieval-Augmented Generation (RAG)</h1>
+        <p>RAG grounds LLM responses in your own data by retrieving relevant documents at query time. This reduces hallucination and enables knowledge-current, source-cited answers.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Build an end-to-end RAG pipeline</li>
+            <li>Choose chunking & embedding strategies</li>
+            <li>Use vector databases</li>
+            <li>Implement Graph RAG</li>
+            <li>Evaluate retrieval quality</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RAG Architecture -->
+      <div class="content-card">
+        <h2>🏗️ Regular RAG Pipeline</h2>
+        <div class="arch-diagram">
+          <div class="arch-label">Indexing Phase (offline)</div>
+          <div class="arch-row">
+            <div class="arch-box user">Documents</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box tool">Chunking</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box embed">Embed Model</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box db">Vector DB</div>
+          </div>
+          <div class="arch-separator"></div>
+          <div class="arch-label">Query Phase (online)</div>
+          <div class="arch-row">
+            <div class="arch-box user">User Query</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box embed">Embed Query</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box retriever">Top-K Retrieve</div>
+            <span class="flow-arrow">+</span>
+            <div class="arch-box llm">LLM</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box tool">Answer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complete RAG Implementation -->
+      <div class="content-card">
+        <h2>⚡ Complete RAG Implementation</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — RAG Pipeline from Scratch</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install openai chromadb langchain-text-splitters pypdf
+from openai import OpenAI
+import chromadb
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pathlib import Path
+
+client = OpenAI()
+chroma = chromadb.Client()
+collection = chroma.create_collection("knowledge_base")
+
+# ── STEP 1: Load & Chunk Documents ──────────────────────
+def load_and_chunk(file_path: str, chunk_size=512, overlap=64) -> list[str]:
+    text = Path(file_path).read_text(encoding="utf-8")
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=overlap,
+        separators=["\n\n", "\n", ". ", " ", ""],
+    )
+    return splitter.split_text(text)
+
+# ── STEP 2: Embed & Store ────────────────────────────────
+def embed_texts(texts: list[str]) -> list[list[float]]:
+    resp = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=texts,
+    )
+    return [d.embedding for d in resp.data]
+
+def index_document(file_path: str):
+    chunks = load_and_chunk(file_path)
+    embeddings = embed_texts(chunks)
+    ids = [f"{file_path}_{i}" for i in range(len(chunks))]
+    collection.add(
+        ids=ids,
+        embeddings=embeddings,
+        documents=chunks,
+        metadatas=[{"source": file_path, "chunk": i} for i in range(len(chunks))]
+    )
+    print(f"Indexed {len(chunks)} chunks from {file_path}")
+
+# ── STEP 3: Retrieve ─────────────────────────────────────
+def retrieve(query: str, k: int = 5) -> list[dict]:
+    query_embedding = embed_texts([query])[0]
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=k,
+        include=["documents", "metadatas", "distances"]
+    )
+    chunks = []
+    for doc, meta, dist in zip(
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0]
+    ):
+        chunks.append({
+            "text": doc,
+            "source": meta["source"],
+            "score": 1 - dist  # Convert distance to similarity
+        })
+    return chunks
+
+# ── STEP 4: Generate Answer ──────────────────────────────
+def rag_query(question: str, k: int = 5) -> dict:
+    # Retrieve relevant chunks
+    chunks = retrieve(question, k=k)
+
+    # Build context
+    context = "\n\n---\n\n".join([
+        f"[Source: {c['source']}, Score: {c['score']:.2f}]\n{c['text']}"
+        for c in chunks
+    ])
+
+    # Generate with context
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": """You are a helpful assistant.
+Answer the user's question based ONLY on the provided context.
+If the answer is not in the context, say "I don't have enough information to answer this."
+Always cite your sources."""},
+            {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}
+        ],
+        temperature=0,
+    )
+
+    return {
+        "answer": response.choices[0].message.content,
+        "sources": [c["source"] for c in chunks],
+        "chunks_used": len(chunks)
+    }
+
+# ── Usage ─────────────────────────────────────────────────
+index_document("company_docs.txt")
+index_document("product_manual.pdf")
+
+result = rag_query("What are the system requirements?")
+print(result["answer"])
+print(f"\nSources: {result['sources']}")</code></pre>
+        </div>
+      </div>
+
+      <!-- Advanced Chunking -->
+      <div class="content-card">
+        <h2>✂️ Chunking Strategies</h2>
+        <table class="compare-table">
+          <tr><th>Strategy</th><th>Description</th><th>Best For</th></tr>
+          <tr><td><span class="badge-blue">Fixed Size</span></td><td>Split every N tokens/chars with overlap</td><td>General text, simple documents</td></tr>
+          <tr><td><span class="badge-green">Recursive</span></td><td>Try paragraph → sentence → word splits</td><td>Prose, books, articles</td></tr>
+          <tr><td><span class="badge-orange">Semantic</span></td><td>Split on topic/semantic boundaries using embeddings</td><td>Multi-topic docs, high accuracy needs</td></tr>
+          <tr><td><span class="badge-purple">Document-aware</span></td><td>Markdown headers, HTML tags, code blocks</td><td>Structured docs, code files</td></tr>
+        </table>
+      </div>
+
+      <!-- Graph RAG -->
+      <div class="content-card">
+        <h2>🕸️ Graph RAG</h2>
+        <p>Graph RAG builds a <strong>knowledge graph</strong> from documents — extracting entities and relationships — then traverses the graph during retrieval to find non-obvious connections that pure vector search misses.</p>
+
+        <div class="arch-diagram">
+          <div class="arch-label">Graph RAG Architecture</div>
+          <div class="arch-row">
+            <div class="arch-box user">Documents</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box llm">Entity &amp; Relation<br>Extraction</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box db">Knowledge<br>Graph (Neo4j)</div>
+          </div>
+          <div style="margin:8px 0;font-size:12px;color:#64748b;">At query time:</div>
+          <div class="arch-row">
+            <div class="arch-box user">Query</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box retriever">Graph Traversal<br>+ Vector Search</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box tool">Sub-graph</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box llm">Answer</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Graph RAG with LLM Extraction</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install openai neo4j
+from openai import OpenAI
+from neo4j import GraphDatabase
+import json
+
+client = OpenAI()
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password"))
+
+# ── Extract Knowledge Graph from Text ────────────────────
+def extract_knowledge(text: str) -> dict:
+    """Extract entities and relationships using LLM."""
+    resp = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": """Extract a knowledge graph from the text.
+Return JSON with:
+- "entities": [{"name": str, "type": str, "description": str}]
+- "relations": [{"from": str, "relation": str, "to": str}]"""},
+            {"role": "user", "content": text}
+        ],
+        response_format={"type": "json_object"},
+        temperature=0,
+    )
+    return json.loads(resp.choices[0].message.content)
+
+# ── Store in Neo4j ────────────────────────────────────────
+def store_graph(kg: dict):
+    with driver.session() as session:
+        # Create entity nodes
+        for entity in kg["entities"]:
+            session.run(
+                "MERGE (e:Entity {name: $name}) SET e.type=$type, e.description=$desc",
+                name=entity["name"], type=entity["type"], desc=entity["description"]
+            )
+        # Create relationship edges
+        for rel in kg["relations"]:
+            session.run(
+                """MATCH (a:Entity {name: $from}), (b:Entity {name: $to})
+                   MERGE (a)-[r:RELATION {type: $rel}]->(b)""",
+                **{"from": rel["from"], "to": rel["to"], "rel": rel["relation"]}
+            )
+
+# ── Graph Traversal Query ────────────────────────────────
+def graph_retrieve(query: str, hops: int = 2) -> str:
+    """Retrieve a subgraph relevant to the query via entity matching + traversal."""
+    # Extract query entities
+    resp = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{
+            "role": "user",
+            "content": f"List the main entity names in this query as JSON array: {query}"
+        }],
+        response_format={"type": "json_object"},
+        temperature=0,
+    )
+    entities = json.loads(resp.choices[0].message.content).get("entities", [])
+
+    results = []
+    with driver.session() as session:
+        for entity in entities[:3]:  # Limit to top 3
+            records = session.run(f"""
+                MATCH path = (start:Entity)-[*1..{hops}]-(connected)
+                WHERE start.name CONTAINS $name
+                RETURN [node in nodes(path) | node.name + ': ' + node.description] as chain,
+                       [rel in relationships(path) | type(rel)] as rels
+                LIMIT 10
+            """, name=entity)
+            for r in records:
+                results.append(" → ".join(r["chain"]))
+    return "\n".join(results)
+
+def graph_rag_query(question: str) -> str:
+    subgraph_context = graph_retrieve(question)
+    resp = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Answer using the knowledge graph context provided."},
+            {"role": "user", "content": f"Knowledge Graph:\n{subgraph_context}\n\nQuestion: {question}"}
+        ],
+    )
+    return resp.choices[0].message.content
+
+# Example
+text = "Apple was founded by Steve Jobs and Steve Wozniak in 1976. Jobs later launched the iPhone in 2007."
+kg = extract_knowledge(text)
+store_graph(kg)
+answer = graph_rag_query("What did Steve Jobs create after founding Apple?")
+print(answer)</code></pre>
+        </div>
+      </div>
+
+      <!-- RAG Evaluation -->
+      <div class="content-card">
+        <h2>📊 Evaluating RAG Quality</h2>
+        <div class="concepts-grid">
+          <div class="concept-item">
+            <div class="concept-title">Context Recall</div>
+            <div class="concept-desc">Are all the facts needed to answer the question present in the retrieved chunks?</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Context Precision</div>
+            <div class="concept-desc">Are retrieved chunks relevant? Low precision = noisy context that confuses the LLM.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Faithfulness</div>
+            <div class="concept-desc">Does the generated answer stay faithful to the retrieved context, or does it hallucinate?</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Answer Relevance</div>
+            <div class="concept-desc">Does the answer actually address the original question asked?</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — RAG Evaluation with RAGAS</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install ragas datasets
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_recall, context_precision
+from datasets import Dataset
+
+# Prepare evaluation dataset
+eval_data = {
+    "question": ["What year was the company founded?"],
+    "answer":   ["The company was founded in 1995."],
+    "contexts": [["Company History: Founded in 1995 by John Smith..."]],
+    "ground_truth": ["1995"],
+}
+
+dataset = Dataset.from_dict(eval_data)
+result = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_recall, context_precision])
+print(result)</code></pre>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod5">← RL Training</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod6">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod7">Agent Systems →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 7: AGENT SYSTEMS
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod7" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#fef2f2; --badge-color:#991b1b;">🕸️ Module 07</div>
+        <h1>Agent Systems</h1>
+        <p>AI agents are LLM-powered systems that can <em>reason, plan, use tools, and take actions</em> in an environment. Agents can work alone or as part of collaborative multi-agent systems.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Implement the ReAct reasoning loop</li>
+            <li>Define and use tools / function calling</li>
+            <li>Add memory to agents</li>
+            <li>Build multi-agent workflows</li>
+            <li>Use LangGraph for stateful agents</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- What is an Agent -->
+      <div class="content-card">
+        <h2>🤖 What is an Agent?</h2>
+        <p>An agent is an LLM in an <strong>action loop</strong>: it perceives state, reasons about what to do, calls a tool, observes the result, and repeats until the task is complete.</p>
+
+        <div class="arch-diagram">
+          <div class="arch-label">Agent Loop (ReAct: Reason + Act)</div>
+          <div class="arch-row">
+            <div class="flow-vertical">
+              <div class="arch-box user">User Goal</div>
+              <div style="font-size:16px;color:#64748b;margin:4px 0;">↓</div>
+              <div class="arch-box llm">Reason<br><span style="font-size:11px;font-weight:400;">What should I do?</span></div>
+              <div style="font-size:16px;color:#64748b;margin:4px 0;">↓</div>
+              <div class="arch-box tool">Act<br><span style="font-size:11px;font-weight:400;">Call tool / API</span></div>
+              <div style="font-size:16px;color:#64748b;margin:4px 0;">↓</div>
+              <div class="arch-box memory">Observe<br><span style="font-size:11px;font-weight:400;">Tool result → context</span></div>
+              <div style="font-size:16px;color:#64748b;margin:4px 0;">↓</div>
+              <div class="arch-box green">Done?<br><span style="font-size:11px;font-weight:400;">Answer or loop again</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="concepts-grid">
+          <div class="concept-item">
+            <div class="concept-title">Tools / Functions</div>
+            <div class="concept-desc">External capabilities: web search, code execution, database queries, API calls, file I/O.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Memory</div>
+            <div class="concept-desc">Short-term: conversation history. Long-term: vector DB. Episodic: past interactions.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">Planning</div>
+            <div class="concept-desc">Breaking complex goals into sub-tasks. ReAct, CoT, ToT, and plan-and-execute patterns.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-title">State</div>
+            <div class="concept-desc">What the agent knows about the world and its progress toward the goal.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Single Agent with Function Calling -->
+      <div class="content-card">
+        <h2>🛠️ Single Agent with Tool Use</h2>
+        <p>OpenAI's function calling API lets you define tools as JSON schemas. The model decides when to call a tool and what arguments to pass.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Single Agent with Tools</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+import json, math, datetime
+
+client = OpenAI()
+
+# ── Define Tools ─────────────────────────────────────────
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "calculator",
+            "description": "Evaluate a mathematical expression. Returns the numeric result.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "expression": {"type": "string", "description": "Math expression, e.g. '2 ** 10 + sqrt(16)'"}
+                },
+                "required": ["expression"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_time",
+            "description": "Get the current date and time in ISO format.",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "web_search",
+            "description": "Search the web for information. Returns snippets.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query"}
+                },
+                "required": ["query"]
+            }
+        }
+    }
+]
+
+# ── Tool Implementations ──────────────────────────────────
+def calculator(expression: str) -> str:
+    try:
+        # Safe eval with math functions only
+        safe_env = {k: getattr(math, k) for k in dir(math) if not k.startswith('_')}
+        result = eval(expression, {"__builtins__": {}}, safe_env)
+        return str(result)
+    except Exception as e:
+        return f"Error: {e}"
+
+def get_current_time() -> str:
+    return datetime.datetime.now().isoformat()
+
+def web_search(query: str) -> str:
+    # Stub — replace with real search API (Tavily, SerpAPI, etc.)
+    return f"Search results for '{query}': [This is a demo stub. Integrate Tavily API for real results.]"
+
+TOOL_MAP = {
+    "calculator": calculator,
+    "get_current_time": get_current_time,
+    "web_search": web_search,
+}
+
+# ── Agent Loop ────────────────────────────────────────────
+def run_agent(user_goal: str, max_steps: int = 10) -> str:
+    messages = [
+        {"role": "system", "content": "You are a helpful AI agent. Use tools when needed to answer accurately."},
+        {"role": "user", "content": user_goal}
+    ]
+
+    for step in range(max_steps):
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
+        )
+
+        msg = response.choices[0].message
+        messages.append(msg)  # Add assistant message to history
+
+        # Check if done (no tool calls)
+        if not msg.tool_calls:
+            print(f"Completed in {step + 1} steps.")
+            return msg.content
+
+        # Execute each tool call
+        for tool_call in msg.tool_calls:
+            fn_name = tool_call.function.name
+            fn_args = json.loads(tool_call.function.arguments)
+            print(f"  [Step {step+1}] Calling {fn_name}({fn_args})")
+
+            fn_result = TOOL_MAP[fn_name](**fn_args)
+
+            # Add tool result to messages
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "name": fn_name,
+                "content": fn_result,
+            })
+
+    return "Max steps reached without completing the task."
+
+# ── Run the Agent ─────────────────────────────────────────
+result = run_agent("What is 2^32, and what time is it right now?")
+print(result)</code></pre>
+        </div>
+      </div>
+
+      <!-- Memory -->
+      <div class="content-card">
+        <h2>🧠 Adding Memory to Agents</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Agent with Vector Memory</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">from openai import OpenAI
+import chromadb
+from datetime import datetime
+
+client = OpenAI()
+chroma = chromadb.Client()
+memory_store = chroma.create_collection("agent_memory")
+
+class AgentWithMemory:
+    def __init__(self, agent_id: str):
+        self.agent_id = agent_id
+        self.short_term = []  # Recent conversation turns
+        self.max_short_term = 20
+
+    def remember(self, text: str, metadata: dict = None):
+        """Store a memory in long-term vector store."""
+        embedding = client.embeddings.create(
+            model="text-embedding-3-small", input=text
+        ).data[0].embedding
+
+        memory_store.add(
+            ids=[f"{self.agent_id}_{datetime.now().timestamp()}"],
+            embeddings=[embedding],
+            documents=[text],
+            metadatas=[{"agent": self.agent_id, "timestamp": str(datetime.now()), **(metadata or {})}]
+        )
+
+    def recall(self, query: str, k: int = 3) -> list[str]:
+        """Retrieve relevant memories."""
+        q_emb = client.embeddings.create(
+            model="text-embedding-3-small", input=query
+        ).data[0].embedding
+
+        results = memory_store.query(
+            query_embeddings=[q_emb],
+            n_results=k,
+            where={"agent": self.agent_id}
+        )
+        return results["documents"][0] if results["documents"] else []
+
+    def chat(self, user_input: str) -> str:
+        # Retrieve relevant memories
+        memories = self.recall(user_input)
+        memory_context = "\n".join([f"- {m}" for m in memories])
+
+        # Build messages with memory
+        system = f"""You are a helpful assistant with a persistent memory.
+Relevant memories from past interactions:
+{memory_context if memories else "No relevant memories yet."}"""
+
+        self.short_term.append({"role": "user", "content": user_input})
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "system", "content": system}] + self.short_term[-self.max_short_term:],
+        )
+
+        reply = response.choices[0].message.content
+        self.short_term.append({"role": "assistant", "content": reply})
+
+        # Store important things in long-term memory
+        self.remember(f"User said: {user_input}")
+        self.remember(f"I responded: {reply[:200]}")
+
+        return reply
+
+agent = AgentWithMemory("assistant_1")
+print(agent.chat("My name is Alice and I'm working on a Python RAG project."))
+print(agent.chat("What was I working on?"))  # Should recall from memory</code></pre>
+        </div>
+      </div>
+
+      <!-- Multi-Agent -->
+      <div class="content-card">
+        <h2>🕸️ Multi-Agent Systems</h2>
+        <p>Multiple specialized agents collaborate, each focusing on what it does best. Common patterns: <strong>Orchestrator-Worker</strong>, <strong>Pipeline</strong>, and <strong>Debate</strong>.</p>
+
+        <div class="arch-diagram">
+          <div class="arch-label">Orchestrator-Worker Pattern</div>
+          <div class="arch-row">
+            <div class="arch-box user">User Goal</div>
+            <span class="flow-arrow">→</span>
+            <div class="arch-box llm" style="padding:12px 20px;">Orchestrator<br><span style="font-size:11px;font-weight:400;">Plans &amp; delegates</span></div>
+          </div>
+          <div class="arch-row" style="margin-top:8px;gap:16px;">
+            <div class="arch-box tool">Researcher<br><span style="font-size:11px;font-weight:400;">Web search</span></div>
+            <div class="arch-box embed">Coder<br><span style="font-size:11px;font-weight:400;">Write code</span></div>
+            <div class="arch-box memory">Critic<br><span style="font-size:11px;font-weight:400;">Review &amp; verify</span></div>
+            <div class="arch-box retriever">Writer<br><span style="font-size:11px;font-weight:400;">Draft output</span></div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Python — Multi-Agent with LangGraph</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># pip install langgraph langchain-openai
+from typing import TypedDict, Annotated
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
+llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
+
+# ── Define Shared State ───────────────────────────────────
+class ResearchState(TypedDict):
+    messages: Annotated[list, add_messages]
+    research_notes: str
+    draft: str
+    critique: str
+    final_output: str
+    task: str
+
+# ── Define Agents (Nodes) ─────────────────────────────────
+def researcher_agent(state: ResearchState) -> dict:
+    """Gathers information relevant to the task."""
+    response = llm.invoke([
+        SystemMessage(content="You are a research expert. Gather key facts and insights."),
+        HumanMessage(content=f"Research this topic thoroughly: {state['task']}")
+    ])
+    return {"research_notes": response.content}
+
+def writer_agent(state: ResearchState) -> dict:
+    """Drafts content based on research."""
+    response = llm.invoke([
+        SystemMessage(content="You are an expert technical writer. Write clearly and accurately."),
+        HumanMessage(content=f"""
+Task: {state['task']}
+Research Notes: {state['research_notes']}
+
+Write a comprehensive, well-structured response.""")
+    ])
+    return {"draft": response.content}
+
+def critic_agent(state: ResearchState) -> dict:
+    """Reviews and critiques the draft."""
+    response = llm.invoke([
+        SystemMessage(content="You are a critical reviewer. Find factual errors, gaps, and improvements."),
+        HumanMessage(content=f"""
+Original Task: {state['task']}
+Draft to Review: {state['draft']}
+
+Provide specific, actionable critique. Rate quality 1-10.""")
+    ])
+    return {"critique": response.content}
+
+def reviser_agent(state: ResearchState) -> dict:
+    """Revises based on critique."""
+    response = llm.invoke([
+        SystemMessage(content="You are a skilled editor. Improve the draft based on critique."),
+        HumanMessage(content=f"""
+Task: {state['task']}
+Original Draft: {state['draft']}
+Critique: {state['critique']}
+
+Produce the final, polished version.""")
+    ])
+    return {"final_output": response.content}
+
+# ── Build Graph ───────────────────────────────────────────
+def build_research_pipeline() -> StateGraph:
+    graph = StateGraph(ResearchState)
+
+    # Add nodes
+    graph.add_node("researcher", researcher_agent)
+    graph.add_node("writer",     writer_agent)
+    graph.add_node("critic",     critic_agent)
+    graph.add_node("reviser",    reviser_agent)
+
+    # Define edges (pipeline flow)
+    graph.set_entry_point("researcher")
+    graph.add_edge("researcher", "writer")
+    graph.add_edge("writer",     "critic")
+    graph.add_edge("critic",     "reviser")
+    graph.add_edge("reviser",    END)
+
+    return graph.compile()
+
+# ── Run Pipeline ──────────────────────────────────────────
+pipeline = build_research_pipeline()
+
+result = pipeline.invoke({
+    "task": "Explain how transformers work in modern LLMs",
+    "messages": [],
+    "research_notes": "",
+    "draft": "",
+    "critique": "",
+    "final_output": "",
+})
+
+print("=== FINAL OUTPUT ===")
+print(result["final_output"])
+print("\n=== CRITIQUE ===")
+print(result["critique"])</code></pre>
+        </div>
+      </div>
+
+      <!-- Agent Frameworks Comparison -->
+      <div class="content-card">
+        <h2>🔧 Agent Framework Comparison</h2>
+        <table class="compare-table">
+          <tr><th>Framework</th><th>Best For</th><th>Key Feature</th><th>Complexity</th></tr>
+          <tr>
+            <td><strong>LangGraph</strong></td>
+            <td>Complex stateful workflows, DAGs</td>
+            <td>Graph-based state machines, cycles</td>
+            <td><span class="badge-orange">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>CrewAI</strong></td>
+            <td>Role-based multi-agent teams</td>
+            <td>Crew + Role abstractions, easy setup</td>
+            <td><span class="badge-green">Low</span></td>
+          </tr>
+          <tr>
+            <td><strong>AutoGen</strong></td>
+            <td>Conversational multi-agent</td>
+            <td>Agent conversations, code execution</td>
+            <td><span class="badge-orange">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Anthropic SDK</strong></td>
+            <td>Production agents with Claude</td>
+            <td>Native tool use, streaming, vision</td>
+            <td><span class="badge-green">Low</span></td>
+          </tr>
+          <tr>
+            <td><strong>Custom</strong></td>
+            <td>Maximum control and performance</td>
+            <td>Build exactly what you need</td>
+            <td><span class="badge-purple">High</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Best Practices -->
+      <div class="content-card">
+        <h2>✅ Agent Design Best Practices</h2>
+        <ul>
+          <li><strong>Design for failure:</strong> Agents will sometimes call wrong tools or loop. Add max step limits, error handling, and fallbacks.</li>
+          <li><strong>Minimal tool surface:</strong> Give agents only the tools they need. Fewer tools = less confusion = more reliable behavior.</li>
+          <li><strong>Structured tool outputs:</strong> Return consistent JSON from tools. Unstructured output confuses agents.</li>
+          <li><strong>Observability:</strong> Log every tool call, reasoning step, and state transition. You need visibility to debug agents.</li>
+          <li><strong>Human-in-the-loop:</strong> For high-stakes actions (deleting data, sending emails), require human approval before execution.</li>
+          <li><strong>Idempotent tools:</strong> Design tools that can be safely retried without side effects (or track completed actions in state).</li>
+        </ul>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠️</div>
+          <div><strong>Security warning:</strong> Never let agents execute arbitrary code from untrusted sources. Sandbox code execution with tools like E2B or Docker. Validate all tool inputs and limit permissions.</div>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod6">← RAG Systems</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod7">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="home">🏠 Back to Home</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────
+         MOCK INTERVIEW SECTION
+    ───────────────────────────────────────────────────────── -->
+    <section id="interview" class="section">
+      <div class="iv-topbar">
+        <button class="iv-tab-btn iv-tab-active" onclick="setIvTab('practice')">🎯 Practice</button>
+        <button class="iv-tab-btn" onclick="setIvTab('browse')">📚 Question Bank</button>
+      </div>
+      <div id="interview-content"></div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────
+         PAYWALL SECTION
+    ───────────────────────────────────────────────────────── -->
+    <section id="paywall" class="section">
+      <div id="paywall-content"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="data/questions.js"></script>
+<script src="js/payment.js"></script>
+<script src="js/interview.js"></script>
+<script src="js/auth.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
