@@ -37,12 +37,15 @@ function safeUser(u) {
   return safe;
 }
 
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
   const header = req.headers.authorization || '';
   const token  = header.startsWith('Bearer ') ? header.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const payload = jwt.verify(token, JWT_SECRET);
+    const user    = await db.findById(payload.sub);
+    if (!user)          return res.status(401).json({ error: 'User not found' });
+    if (user.disabled)  return res.status(403).json({ error: 'Account disabled. Please contact support.' });
     req.userId = payload.sub;
     next();
   } catch {
@@ -232,6 +235,20 @@ router.post('/subscription', authMiddleware, async (req, res) => {
 
   const updated = await db.findById(user.id);
   res.json({ credits: updated.credits, subscription: sub });
+});
+
+// ── POST /api/auth/progress ───────────────────────────────
+router.post('/progress', authMiddleware, async (req, res) => {
+  const { course, module, lesson } = req.body;
+  if (!course || !module || !lesson) return res.status(400).json({ error: 'course, module, and lesson are required' });
+  await db.upsertProgress(req.userId, course, module, lesson);
+  res.json({ ok: true });
+});
+
+// ── GET /api/auth/progress ────────────────────────────────
+router.get('/progress', authMiddleware, async (req, res) => {
+  const progress = await db.getUserProgress(req.userId);
+  res.json({ progress });
 });
 
 module.exports = { router, authMiddleware };

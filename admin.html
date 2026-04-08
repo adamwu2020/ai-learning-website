@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — AI Learning</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-w: 240px;
+      --primary: #4f46e5;
+      --primary-dark: #1e1b4b;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-400: #94a3b8;
+      --gray-600: #475569;
+      --gray-800: #1e293b;
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--gray-800); }
+
+    /* ── Login ───────────────────────────────────────────── */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    }
+    .login-card {
+      background: #fff; border-radius: 16px; padding: 40px; width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-logo { text-align: center; margin-bottom: 28px; }
+    .login-logo .icon { font-size: 40px; }
+    .login-logo h1 { font-size: 22px; font-weight: 800; color: var(--primary-dark); margin-top: 8px; }
+    .login-logo p  { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+    .form-group input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200);
+      border-radius: 8px; font-size: 14px; transition: border-color .2s;
+    }
+    .form-group input:focus { outline: none; border-color: var(--primary); }
+    .btn-primary {
+      width: 100%; padding: 12px; background: var(--primary); color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+    #login-error { color: var(--danger); font-size: 13px; margin-top: 10px; text-align: center; min-height: 18px; }
+
+    /* ── Dashboard layout ────────────────────────────────── */
+    #dashboard { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: var(--sidebar-w); background: var(--primary-dark); color: #fff;
+      display: flex; flex-direction: column; flex-shrink: 0; position: fixed;
+      top: 0; left: 0; bottom: 0; z-index: 10;
+    }
+    .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .sidebar-brand .icon { font-size: 28px; }
+    .sidebar-brand h2  { font-size: 16px; font-weight: 800; margin-top: 6px; }
+    .sidebar-brand p   { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 2px; }
+    .sidebar-nav { padding: 16px 0; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 20px;
+      cursor: pointer; font-size: 14px; font-weight: 500; border-radius: 0;
+      color: rgba(255,255,255,.7); transition: all .15s;
+    }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,.1); color: #fff; }
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.1); }
+    .admin-info { font-size: 12px; color: rgba(255,255,255,.5); }
+    .admin-info strong { display: block; color: rgba(255,255,255,.9); font-size: 13px; margin-bottom: 2px; }
+    .btn-logout {
+      margin-top: 10px; width: 100%; padding: 8px; background: rgba(255,255,255,.1);
+      color: rgba(255,255,255,.8); border: none; border-radius: 6px; font-size: 13px;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.2); }
+
+    .main-content { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+    .top-bar {
+      background: #fff; border-bottom: 1px solid var(--gray-200);
+      padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 5;
+    }
+    .top-bar h1 { font-size: 20px; font-weight: 800; color: var(--gray-800); }
+    .top-bar .subtitle { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
+    .content { padding: 28px; }
+
+    /* ── Stats ───────────────────────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: #fff; border-radius: 12px; padding: 20px;
+      border: 1px solid var(--gray-200); display: flex; align-items: center; gap: 16px;
+    }
+    .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .stat-icon.blue   { background: #eff6ff; }
+    .stat-icon.green  { background: #f0fdf4; }
+    .stat-icon.yellow { background: #fffbeb; }
+    .stat-icon.red    { background: #fef2f2; }
+    .stat-body .value { font-size: 26px; font-weight: 800; color: var(--gray-800); }
+    .stat-body .label { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+    /* ── Card ────────────────────────────────────────────── */
+    .card { background: #fff; border-radius: 12px; border: 1px solid var(--gray-200); overflow: hidden; }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .card-header h2 { font-size: 16px; font-weight: 700; }
+    .card-header .count { font-size: 13px; color: var(--gray-400); }
+
+    /* ── Search & filter ─────────────────────────────────── */
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .search-box {
+      padding: 8px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 13px; width: 260px; outline: none; transition: border-color .2s;
+    }
+    .search-box:focus { border-color: var(--primary); }
+    .filter-select {
+      padding: 8px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 13px; background: #fff; cursor: pointer; outline: none;
+    }
+
+    /* ── Table ───────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700;
+      color: var(--gray-400); text-transform: uppercase; letter-spacing: .06em;
+      background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+    }
+    tbody tr { border-bottom: 1px solid var(--gray-100); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--gray-50); }
+    td { padding: 12px 16px; font-size: 13px; vertical-align: middle; }
+    .user-name { font-weight: 600; color: var(--gray-800); }
+    .user-email { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+
+    /* ── Badges ──────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-green   { background: #d1fae5; color: #065f46; }
+    .badge-gray    { background: var(--gray-100); color: var(--gray-600); }
+    .badge-red     { background: #fee2e2; color: #991b1b; }
+    .badge-yellow  { background: #fef3c7; color: #92400e; }
+    .badge-blue    { background: #dbeafe; color: #1e40af; }
+
+    /* ── Action buttons ──────────────────────────────────── */
+    .actions { display: flex; gap: 6px; }
+    .btn-icon {
+      padding: 5px 10px; border-radius: 6px; border: 1px solid var(--gray-200);
+      background: #fff; font-size: 12px; cursor: pointer; transition: all .15s;
+      color: var(--gray-600); white-space: nowrap;
+    }
+    .btn-icon:hover { background: var(--gray-100); }
+    .btn-icon.danger  { border-color: #fecaca; color: var(--danger); }
+    .btn-icon.danger:hover  { background: #fee2e2; }
+    .btn-icon.warning { border-color: #fde68a; color: #b45309; }
+    .btn-icon.warning:hover { background: #fef3c7; }
+    .btn-icon.success { border-color: #a7f3d0; color: #065f46; }
+    .btn-icon.success:hover { background: #d1fae5; }
+    .btn-icon.primary { border-color: #c7d2fe; color: var(--primary); }
+    .btn-icon.primary:hover { background: #eff6ff; }
+
+    /* ── Modal ───────────────────────────────────────────── */
+    #modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+    }
+    #modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 16px; width: 100%; max-width: 700px;
+      max-height: 90vh; display: flex; flex-direction: column;
+      box-shadow: 0 25px 80px rgba(0,0,0,.25);
+    }
+    .modal-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 18px; font-weight: 800; }
+    .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray-400); line-height: 1; }
+    .modal-close:hover { color: var(--gray-800); }
+    .modal-body { overflow-y: auto; flex: 1; padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* ── Tabs ────────────────────────────────────────────── */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--gray-200); margin-bottom: 20px; }
+    .tab {
+      padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+      color: var(--gray-400); border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: all .15s;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Info grid ───────────────────────────────────────── */
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .info-item label { font-size: 11px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 4px; }
+    .info-item .value { font-size: 14px; color: var(--gray-800); font-weight: 500; }
+
+    /* ── Progress ────────────────────────────────────────── */
+    .progress-section { margin-bottom: 20px; }
+    .progress-section h3 { font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    .module-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .module-name { font-size: 13px; width: 80px; flex-shrink: 0; color: var(--gray-600); }
+    .progress-bar-wrap { flex: 1; height: 8px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width .3s; }
+    .module-pct { font-size: 12px; color: var(--gray-400); width: 36px; text-align: right; }
+
+    /* ── Tx table ────────────────────────────────────────── */
+    .tx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tx-table th { padding: 8px 10px; text-align: left; font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--gray-200); }
+    .tx-table td { padding: 9px 10px; border-bottom: 1px solid var(--gray-100); }
+    .tx-table tr:last-child td { border-bottom: none; }
+    .tx-credit { color: var(--success); font-weight: 600; }
+    .tx-debit  { color: var(--danger);  font-weight: 600; }
+
+    .empty-msg { text-align: center; color: var(--gray-400); padding: 32px; font-size: 14px; }
+    .divider { height: 1px; background: var(--gray-200); margin: 20px 0; }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Login Screen ──────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">🤖</div>
+      <h1>AI Learning</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <form id="login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="admin-email" placeholder="admin@example.com" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-primary" id="login-btn">Sign in</button>
+      <div id="login-error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Dashboard ─────────────────────────────────────────── -->
+<div id="dashboard" hidden>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="icon">🤖</div>
+      <h2>AI Learning</h2>
+      <p>Admin Console</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-view="overview">
+        <span class="nav-icon">📊</span> Overview
+      </div>
+      <div class="nav-item" data-view="users">
+        <span class="nav-icon">👥</span> Users
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <strong id="admin-name-display">Admin</strong>
+        <span id="admin-email-display"></span>
+      </div>
+      <button class="btn-logout" id="logout-btn">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <div class="top-bar">
+      <div>
+        <h1 id="view-title">Overview</h1>
+        <div class="subtitle" id="view-subtitle">Platform statistics</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Overview view -->
+      <div id="view-overview">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card"><div class="stat-icon blue">👥</div><div class="stat-body"><div class="value" id="stat-total">—</div><div class="label">Total Users</div></div></div>
+          <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-body"><div class="value" id="stat-subscribed">—</div><div class="label">Active Subscriptions</div></div></div>
+          <div class="stat-card"><div class="stat-icon yellow">💳</div><div class="stat-body"><div class="value" id="stat-credits">—</div><div class="label">Total Credits Held</div></div></div>
+          <div class="stat-card"><div class="stat-icon red">🚫</div><div class="stat-body"><div class="value" id="stat-disabled">—</div><div class="label">Disabled Accounts</div></div></div>
+        </div>
+
+        <!-- Recent users in overview -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Registrations</h2>
+            <button class="btn-icon primary" onclick="switchView('users')">View all users →</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Joined</th><th>Status</th><th>Subscription</th></tr></thead>
+              <tbody id="recent-users-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users view -->
+      <div id="view-users" hidden>
+        <div class="card">
+          <div class="card-header">
+            <h2>All Users <span class="count" id="users-count"></span></h2>
+            <div class="toolbar">
+              <input class="search-box" id="user-search" type="text" placeholder="Search by name or email…">
+              <select class="filter-select" id="user-filter">
+                <option value="all">All users</option>
+                <option value="subscribed">Subscribed</option>
+                <option value="active">Active</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Credits</th>
+                  <th>Subscription</th>
+                  <th>Joined</th>
+                  <th>Last Login</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-content -->
+</div><!-- /dashboard -->
+
+<!-- ── User Detail Modal ──────────────────────────────────── -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">User Details</h2>
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <div class="tab active" data-tab="info">Profile</div>
+        <div class="tab" data-tab="progress">Progress</div>
+        <div class="tab" data-tab="transactions">Transactions</div>
+      </div>
+
+      <!-- Profile tab -->
+      <div class="tab-panel active" id="tab-info">
+        <div class="info-grid" id="user-info-grid"></div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="modal-actions"></div>
+      </div>
+
+      <!-- Progress tab -->
+      <div class="tab-panel" id="tab-progress">
+        <div id="progress-content"></div>
+      </div>
+
+      <!-- Transactions tab -->
+      <div class="tab-panel" id="tab-transactions">
+        <table class="tx-table">
+          <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Note</th></tr></thead>
+          <tbody id="tx-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

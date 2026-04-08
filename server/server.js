@@ -4,10 +4,13 @@
 // ============================================================
 require('dotenv').config();
 
-const express = require('express');
-const cors    = require('cors');
-const path    = require('path');
-const { router: authRouter } = require('./routes/auth');
+const express  = require('express');
+const cors     = require('cors');
+const path     = require('path');
+const bcrypt   = require('bcryptjs');
+const { db }   = require('./db');
+const { router: authRouter }  = require('./routes/auth');
+const { router: adminRouter } = require('./routes/admin');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -40,7 +43,8 @@ app.use((req, _res, next) => {
 });
 
 // ── Routes ─────────────────────────────────────────────────
-app.use('/api/auth', authRouter);
+app.use('/api/auth',  authRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
@@ -61,9 +65,24 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// ── Seed admin account ─────────────────────────────────────
+async function seedAdmin() {
+  try {
+    const existing = await db.findAdminUser();
+    if (!existing) {
+      const hash = await bcrypt.hash('LearnaiAdmin1234!', 12);
+      await db.createAdminUser('Admin', 'info@learnai.wetrainagent.com', hash);
+      console.log('✅ Admin account created: info@learnai.wetrainagent.com');
+    }
+  } catch (err) {
+    console.error('Admin seed error (run schema SQL in Supabase if tables are missing):', err.message);
+  }
+}
+
 // ── Start ──────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\n🚀 Auth server running at http://localhost:${PORT}`);
   console.log(`   Frontend expected at: ${process.env.FRONTEND_URL || 'http://localhost:5500'}`);
   console.log(`   Health check: http://localhost:${PORT}/api/health\n`);
+  await seedAdmin();
 });
