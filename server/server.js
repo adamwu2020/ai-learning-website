@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors    = require('cors');
+const path    = require('path');
 const { router: authRouter } = require('./routes/auth');
 
 const app  = express();
@@ -45,8 +46,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// 404
-app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
+// ── Static frontend ────────────────────────────────────────
+const STATIC_DIR = path.join(__dirname, '..');
+app.use(express.static(STATIC_DIR));
+
+// SPA fallback — serve index.html for any unmatched route
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(STATIC_DIR, 'index.html'));
+});
 
 // Global error handler
 app.use((err, _req, res, _next) => {
