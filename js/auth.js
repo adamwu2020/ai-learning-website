@@ -2,7 +2,7 @@
 //  Auth Client — Register, Login, Forgot Password
 // ============================================================
 
-const API = 'http://localhost:3001/api';
+const API = '/api';
 const TOKEN_KEY = 'ai-learn-token';
 
 // ── State ──────────────────────────────────────────────────
@@ -23,7 +23,7 @@ async function apiFetch(path, opts = {}) {
     });
   } catch (err) {
     // Network error — server is likely not running
-    throw new Error('Cannot connect to auth server. Please run ./start-server.sh in your terminal first.');
+    throw new Error('Cannot connect to server. Please check your internet connection and try again.');
   }
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Request failed');
