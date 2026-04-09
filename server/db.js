@@ -56,7 +56,7 @@ const db = {
   getCoupons:          ()                         => pool.query('SELECT * FROM coupons ORDER BY created_at DESC').then(r => r.rows),
   getCouponByCode:     (code)                     => pool.query('SELECT * FROM coupons WHERE UPPER(code) = UPPER($1)', [code]).then(r => r.rows[0] ?? null),
   createCoupon:        (code, days, expiresAt)    => pool.query('INSERT INTO coupons (code, days, expires_at) VALUES (UPPER($1), $2, $3) RETURNING *', [code, days, expiresAt || null]).then(r => r.rows[0]),
-  updateCoupon:        (id, days, expiresAt)      => pool.query('UPDATE coupons SET days = $1, expires_at = $2 WHERE id = $3 RETURNING *', [days, expiresAt || null, id]).then(r => r.rows[0]),
+  updateCoupon:        (id, code, days, expiresAt) => pool.query('UPDATE coupons SET code = UPPER($1), days = $2, expires_at = $3 WHERE id = $4 RETURNING *', [code, days, expiresAt || null, id]).then(r => r.rows[0]),
   deleteCoupon:        (id)                       => pool.query('DELETE FROM coupons WHERE id = $1', [id]),
   incrementCouponUsed: (code)                     => pool.query('UPDATE coupons SET used_count = used_count + 1 WHERE UPPER(code) = UPPER($1)', [code]),
 

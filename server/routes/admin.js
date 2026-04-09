@@ -183,9 +183,15 @@ router.post('/coupons', adminMiddleware, async (req, res) => {
 // ── PUT /api/admin/coupons/:id ────────────────────────────
 router.put('/coupons/:id', adminMiddleware, async (req, res) => {
   try {
-    const { days, expires_at } = req.body;
+    const { code, days, expires_at } = req.body;
+    if (!code || !code.trim()) return res.status(400).json({ error: 'Code is required' });
     if (!days || days < 1 || days > 10000) return res.status(400).json({ error: 'Days must be between 1 and 10000' });
-    const coupon = await db.updateCoupon(req.params.id, days, expires_at || null);
+    // Check for duplicate code (excluding this coupon)
+    const existing = await db.getCouponByCode(code.trim());
+    if (existing && String(existing.id) !== String(req.params.id)) {
+      return res.status(409).json({ error: 'A coupon with that code already exists' });
+    }
+    const coupon = await db.updateCoupon(req.params.id, code.trim(), days, expires_at || null);
     if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
     res.json({ coupon });
   } catch (err) {

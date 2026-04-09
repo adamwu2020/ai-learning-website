@@ -466,7 +466,7 @@ function openCouponModal(id) {
     if (!c) return;
     document.getElementById('coupon-modal-title').textContent = 'Edit Coupon';
     document.getElementById('coupon-code').value    = c.code;
-    document.getElementById('coupon-code').disabled = true;
+    document.getElementById('coupon-code').disabled = false;
     document.getElementById('coupon-days').value    = c.days;
     document.getElementById('coupon-expires').value = c.expires_at
       ? new Date(c.expires_at).toISOString().slice(0, 10)
@@ -505,14 +505,14 @@ async function saveCoupon() {
   const expiresRaw = document.getElementById('coupon-expires').value;
   const expires_at = expiresRaw ? new Date(expiresRaw + 'T23:59:59').toISOString() : null;
 
-  if (!editingCouponId && !code) { errEl.textContent = 'Code is required.'; return; }
+  if (!code) { errEl.textContent = 'Code is required.'; return; }
   if (!days || days < 1 || days > 10000) { errEl.textContent = 'Days must be between 1 and 10,000.'; return; }
 
   btn.disabled = true;
   btn.textContent = 'Saving…';
   try {
     if (editingCouponId) {
-      await api('PUT', `/coupons/${editingCouponId}`, { days, expires_at });
+      await api('PUT', `/coupons/${editingCouponId}`, { code, days, expires_at });
     } else {
       await api('POST', '/coupons', { code, days, expires_at });
     }
