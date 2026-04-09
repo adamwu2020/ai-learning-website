@@ -48,8 +48,9 @@ function updateCreditDisplay() {
 }
 
 // ── Payment Modal ──────────────────────────────────────────
-let _stripeLinks = null; // cached after first fetch
-let _txHistory   = null; // cached server transactions
+let _stripeLinks  = null; // cached after first fetch
+let _txHistory    = null; // cached server transactions
+let _referralInfo = null; // cached referral code + stats
 
 async function openPaymentModal() {
   document.getElementById('paymentModal').classList.add('open');
@@ -72,7 +73,18 @@ async function openPaymentModal() {
         try {
           const data = await apiFetch('/auth/credits');
           _txHistory = data.transactions || [];
+          if (data.referral_balance_cents !== undefined) {
+            currentUser.referral_balance_cents = data.referral_balance_cents;
+          }
         } catch { _txHistory = null; }
+      }
+    })(),
+    (async () => {
+      // Load referral info for logged-in users
+      if (typeof currentUser !== 'undefined' && currentUser) {
+        try {
+          _referralInfo = await apiFetch('/referral/code');
+        } catch { _referralInfo = null; }
       }
     })(),
   ]);
@@ -80,7 +92,8 @@ async function openPaymentModal() {
 }
 function closePaymentModal() {
   document.getElementById('paymentModal').classList.remove('open');
-  _txHistory = null; // refresh on next open
+  _txHistory    = null; // refresh on next open
+  _referralInfo = null;
 }
 
 function renderPaymentModal() {
@@ -178,6 +191,7 @@ function renderPaymentModal() {
     <div class="pm-tabs">
       <button class="pm-tab active" onclick="showPmTab('plans')">Subscription Plans</button>
       <button class="pm-tab" onclick="showPmTab('coupon')">🎟️ Coupon Code</button>
+      <button class="pm-tab" onclick="showPmTab('referral')">🎁 Referrals</button>
       <button class="pm-tab" onclick="showPmTab('history')">History</button>
     </div>
 
@@ -247,6 +261,70 @@ function renderPaymentModal() {
       </div>
     </div>
 
+    <div id="pm-tab-referral" class="pm-tab-content" style="display:none">
+      ${(() => {
+        const ref = _referralInfo;
+        if (!ref) {
+          return `<div class="pm-card"><p style="color:#64748b;text-align:center;padding:20px">Sign in to access your referral link.</p></div>`;
+        }
+        const balanceDollars = (ref.referralBalanceCents / 100).toFixed(2);
+        const earnedDollars  = (ref.stats.totalCents / 100).toFixed(2);
+        const hasBalance     = ref.referralBalanceCents > 0;
+        const creditsIfRedeem = Math.floor(ref.referralBalanceCents / 50);
+        return `
+          <div class="pm-card" style="margin-bottom:12px">
+            <div class="pm-card-title">🎁 Invite Friends, Earn Rewards</div>
+            <div class="pm-card-desc" style="margin-bottom:16px">Share your unique link. You <strong>and your friend</strong> each get <strong>$20 referral credit</strong> when they sign up.</div>
+
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="flex:1">
+                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:6px">Your Referral Link</label>
+                <div style="display:flex;gap:6px">
+                  <input id="referral-link-input" type="text" readonly value="${ref.referralUrl}"
+                    style="flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#475569;background:#f8fafc;cursor:pointer"
+                    onclick="this.select()">
+                  <button onclick="copyReferralLink()" style="padding:8px 14px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap" id="copy-ref-btn">Copy</button>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:16px">
+                  <div style="text-align:center;background:#f0fdf4;border-radius:8px;padding:10px 16px;flex:1">
+                    <div style="font-size:22px;font-weight:800;color:#166534">${ref.stats.count}</div>
+                    <div style="font-size:11px;color:#16a34a;font-weight:600">Friends Referred</div>
+                  </div>
+                  <div style="text-align:center;background:#f0fdf4;border-radius:8px;padding:10px 16px;flex:1">
+                    <div style="font-size:22px;font-weight:800;color:#166534">$${earnedDollars}</div>
+                    <div style="font-size:11px;color:#16a34a;font-weight:600">Total Earned</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:6px;text-align:center">QR Code</label>
+                <div id="referral-qr" style="width:100px;height:100px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94a3b8"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pm-card">
+            <div class="pm-card-title">💰 Referral Balance</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <div>
+                <div style="font-size:28px;font-weight:800;color:${hasBalance ? '#166534' : '#94a3b8'}">$${balanceDollars}</div>
+                <div style="font-size:12px;color:#64748b;margin-top:2px">
+                  ${hasBalance ? `= ${creditsIfRedeem} credits if redeemed` : 'Earn $20 per referral'}
+                </div>
+              </div>
+              <button id="redeem-ref-btn" onclick="redeemReferralBalance()"
+                style="padding:10px 20px;background:${hasBalance ? '#10b981' : '#e2e8f0'};color:${hasBalance ? 'white' : '#94a3b8'};border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:${hasBalance ? 'pointer' : 'default'}"
+                ${hasBalance ? '' : 'disabled'}>
+                ${hasBalance ? 'Redeem Credits' : 'No Balance'}
+              </button>
+            </div>
+            <div id="redeem-msg" style="font-size:13px;margin-top:10px;min-height:18px"></div>
+            <div style="font-size:12px;color:#94a3b8;margin-top:8px">Credits can be used for mock interviews ($0.50/credit).</div>
+          </div>
+        `;
+      })()}
+    </div>
+
     <div id="pm-tab-history" class="pm-tab-content" style="display:none">
       <div class="pm-card">
         <div class="pm-card-title">📋 Transaction History</div>
@@ -286,12 +364,70 @@ function renderPaymentModal() {
 
 function showPmTab(name) {
   document.querySelectorAll('.pm-tab').forEach((t, i) => {
-    const tabs = ['plans', 'coupon', 'history'];
+    const tabs = ['plans', 'coupon', 'referral', 'history'];
     t.classList.toggle('active', tabs[i] === name);
   });
   document.querySelectorAll('.pm-tab-content').forEach(c => c.style.display = 'none');
   const target = document.getElementById(`pm-tab-${name}`);
   if (target) target.style.display = 'block';
+
+  // Render QR code when referral tab opens
+  if (name === 'referral' && _referralInfo?.referralUrl) {
+    renderReferralQR(_referralInfo.referralUrl);
+  }
+}
+
+function renderReferralQR(url) {
+  const container = document.getElementById('referral-qr');
+  if (!container) return;
+  container.innerHTML = '';
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(container, { text: url, width: 100, height: 100, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    // Fallback: show the code text
+    container.textContent = 'QR unavailable';
+  }
+}
+
+function copyReferralLink() {
+  const input = document.getElementById('referral-link-input');
+  const btn   = document.getElementById('copy-ref-btn');
+  if (!input || !btn) return;
+  navigator.clipboard.writeText(input.value).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.background = '#10b981';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = '#6366f1'; }, 2000);
+  });
+}
+
+async function redeemReferralBalance() {
+  const btn   = document.getElementById('redeem-ref-btn');
+  const msgEl = document.getElementById('redeem-msg');
+  if (!btn || btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Redeeming…';
+  if (msgEl) { msgEl.style.color = '#64748b'; msgEl.textContent = 'Processing…'; }
+
+  try {
+    const data = await apiFetch('/referral/redeem', { method: 'POST' });
+    if (typeof currentUser !== 'undefined' && currentUser) {
+      currentUser.credits = data.newCredits;
+      currentUser.referral_balance_cents = data.newBalanceCents;
+      updateCreditDisplay();
+    }
+    _referralInfo = null; // force refresh
+    if (msgEl) {
+      msgEl.style.color = '#065f46';
+      msgEl.textContent = `✓ Redeemed $${(data.redeemedCents / 100).toFixed(2)} → ${data.creditsAdded} credits added!`;
+    }
+    // Refresh the tab content
+    setTimeout(() => renderPaymentModal(), 1500);
+  } catch (err) {
+    if (msgEl) { msgEl.style.color = '#ef4444'; msgEl.textContent = err.message; }
+    btn.disabled = false;
+    btn.textContent = 'Redeem Credits';
+  }
 }
 
 // ── Subscriptions ──────────────────────────────────────────

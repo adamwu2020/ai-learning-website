@@ -25,6 +25,7 @@ const MODULE_NAMES = {
   mod5: 'Module 5 — RL with LLM-as-Judge',
   mod6: 'Module 6 — RAG Systems',
   mod7: 'Module 7 — Agent Systems',
+  mod8: 'Module 8 — OpenClaw',
 };
 
 // ── Open the Interview Setup Screen ───────────────────────

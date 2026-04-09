@@ -17,6 +17,7 @@ const { router: authRouter }  = require('./routes/auth');
 const { router: adminRouter } = require('./routes/admin');
 const { router: stripeRouter, webhookHandler } = require('./routes/stripe');
 const { router: interviewRouter } = require('./routes/interview');
+const { router: referralRouter }  = require('./routes/referral');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -57,6 +58,7 @@ app.use('/api/auth',   authRouter);
 app.use('/api/admin',  adminRouter);
 app.use('/api/stripe',    stripeRouter);
 app.use('/api/interview', interviewRouter);
+app.use('/api/referral',  referralRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });

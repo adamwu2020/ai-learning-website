@@ -60,6 +60,25 @@ const db = {
   deleteCoupon:        (id)                       => pool.query('DELETE FROM coupons WHERE id = $1', [id]),
   incrementCouponUsed: (code)                     => pool.query('UPDATE coupons SET used_count = used_count + 1 WHERE UPPER(code) = UPPER($1)', [code]),
 
+  // ── Referrals ────────────────────────────────────────────
+  createReferralTable: () => pool.query(`
+    CREATE TABLE IF NOT EXISTS referrals (
+      id           SERIAL PRIMARY KEY,
+      referrer_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      referred_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+      amount_cents INTEGER NOT NULL DEFAULT 2000,
+      created_at   TIMESTAMPTZ DEFAULT NOW()
+    );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code VARCHAR(16) UNIQUE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_balance_cents INTEGER NOT NULL DEFAULT 0;
+  `),
+  findByReferralCode:  (code)   => pool.query('SELECT * FROM users WHERE UPPER(referral_code) = UPPER($1)', [code]).then(r => r.rows[0] ?? null),
+  setReferralCode:     (id, code) => pool.query('UPDATE users SET referral_code = $1 WHERE id = $2', [code, id]),
+  addReferralBalance:  (id, cents) => pool.query('UPDATE users SET referral_balance_cents = referral_balance_cents + $1 WHERE id = $2', [cents, id]),
+  deductReferralBalance: (id, cents) => pool.query('UPDATE users SET referral_balance_cents = referral_balance_cents - $1 WHERE id = $2 RETURNING referral_balance_cents', [cents, id]).then(r => r.rows[0]),
+  insertReferral:      (referrerId, referredId, amountCents) => pool.query('INSERT INTO referrals (referrer_id, referred_id, amount_cents) VALUES ($1, $2, $3) ON CONFLICT (referred_id) DO NOTHING', [referrerId, referredId, amountCents]),
+  getReferralStats:    (userId) => pool.query('SELECT COUNT(*) AS count, COALESCE(SUM(amount_cents), 0) AS total_cents FROM referrals WHERE referrer_id = $1', [userId]).then(r => r.rows[0]),
+
   // ── Admin ────────────────────────────────────────────────
   findAdminUser:   ()                    => pool.query('SELECT id FROM users WHERE is_admin = TRUE LIMIT 1').then(r => r.rows[0] ?? null),
   createAdminUser: (name, email, hash)   => pool.query(`

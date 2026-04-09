@@ -120,7 +120,7 @@
         <div class="lp-section-inner">
           <div class="lp-section-label">CURRICULUM</div>
           <h2 class="lp-section-title">A Complete AI Engineering Curriculum</h2>
-          <p class="lp-section-sub">Sign in to unlock all 7 modules and track your progress</p>
+          <p class="lp-section-sub">Sign in to unlock all 8 modules and track your progress</p>
           <div class="lp-modules-grid">
 
             <div class="lp-module-card" style="--mc:#6366f1">
@@ -198,6 +198,17 @@
               <div class="lp-mc-title">Agent Systems</div>
               <div class="lp-mc-desc">Design single and multi-agent systems with tools, memory, and planning.</div>
               <div class="lp-mc-tags"><span>ReAct</span><span>Multi-Agent</span><span>LangGraph</span></div>
+            </div>
+
+            <div class="lp-module-card" style="--mc:#0d9488">
+              <div class="lp-mc-top">
+                <div class="lp-mc-icon" style="background:#f0fdfa">🦀</div>
+                <div class="lp-mc-lock">🔒</div>
+              </div>
+              <div class="lp-mc-num">Module 08</div>
+              <div class="lp-mc-title">OpenClaw</div>
+              <div class="lp-mc-desc">Deploy self-hosted multi-channel AI agents across Discord, Slack, Telegram, and 20+ platforms.</div>
+              <div class="lp-mc-tags"><span>Multi-Channel</span><span>Multi-Agent</span><span>Self-Hosted</span></div>
             </div>
 
             <!-- Unlock card -->
@@ -466,6 +477,18 @@
           </div>
           <div class="module-card-desc">Design single and multi-agent systems with tool use, memory, planning, and inter-agent communication.</div>
           <div class="module-tags"><span class="tag">ReAct</span><span class="tag">Tool Use</span><span class="tag">Multi-Agent</span><span class="tag">LangGraph</span></div>
+        </div>
+
+        <div class="module-card" data-target="mod8" style="--card-accent:#0d9488; --icon-bg:#f0fdfa;">
+          <div class="module-card-header">
+            <div class="module-card-icon">🦀</div>
+            <div class="module-card-meta">
+              <div class="module-num">Module 08</div>
+              <div class="module-title">OpenClaw</div>
+            </div>
+          </div>
+          <div class="module-card-desc">Deploy self-hosted multi-channel AI agents across Discord, Slack, Telegram, WhatsApp, and 20+ platforms with multi-agent routing.</div>
+          <div class="module-tags"><span class="tag">Multi-Channel</span><span class="tag">Multi-Agent</span><span class="tag">Gateway</span><span class="tag">Self-Hosted</span></div>
         </div>
       </div>
 
@@ -2641,6 +2664,311 @@ print(result["critique"])</code></pre>
         <button class="nav-btn" data-nav="mod6">← RAG Systems</button>
         <div style="display:flex;gap:10px">
           <button class="done-btn" data-done="mod7">✓ Mark Complete</button>
+          <button class="nav-btn primary" data-nav="mod8">OpenClaw →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────
+         MODULE 8: OPENCLAW
+    ───────────────────────────────────────────────────────── -->
+    <section id="mod8" class="section">
+      <div class="section-header">
+        <div class="section-badge" style="--badge-bg:#f0fdfa; --badge-color:#0d9488;">🦀 Module 08</div>
+        <h1>OpenClaw</h1>
+        <p>OpenClaw is a <em>self-hosted, multi-channel AI gateway</em> that connects 26+ messaging platforms — Discord, Slack, Telegram, WhatsApp, iMessage, Signal, Teams and more — to AI coding agents. It's MIT-licensed and runs on a single machine with hot-reload configuration.</p>
+        <div class="learning-objectives">
+          <h4>Learning Objectives</h4>
+          <ul>
+            <li>Understand the Gateway–Agent–Channel architecture</li>
+            <li>Install and configure OpenClaw with multiple channels</li>
+            <li>Create isolated agents with custom tools and routing rules</li>
+            <li>Implement multi-agent routing with deterministic priority binding</li>
+            <li>Manage agent memory, sessions, and long-running context</li>
+            <li>Secure and deploy OpenClaw for production use</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Architecture Overview -->
+      <div class="content-card">
+        <h2>🏗️ Architecture Overview</h2>
+        <p>OpenClaw is built around four primary primitives that compose into a complete AI gateway:</p>
+        <div class="concept-grid">
+          <div class="concept-item">
+            <div class="concept-icon">🔌</div>
+            <div><strong>Gateway</strong> — The central long-lived daemon. Maintains persistent connections to all messaging platforms and exposes a WebSocket API for clients.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-icon">🤖</div>
+            <div><strong>Agents</strong> — Isolated AI entities, each with a separate workspace, authentication context, and session store. Each agent can use a different LLM provider.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-icon">📡</div>
+            <div><strong>Channels</strong> — Adapters for 26+ messaging platforms. Each channel routes incoming messages to the appropriate agent using binding rules.</div>
+          </div>
+          <div class="concept-item">
+            <div class="concept-icon">🛠️</div>
+            <div><strong>Tools</strong> — Functions agents can invoke: file ops, web browsing, shell commands, media generation, cron scheduling, and device capabilities.</div>
+          </div>
+        </div>
+        <div class="arch-diagram">
+          <div class="arch-box" style="background:#f0fdfa;border-color:#0d9488">Discord / Slack / Telegram / WhatsApp / 22+ more</div>
+          <div class="arch-arrow">↓ messages</div>
+          <div class="arch-box" style="background:#f0fdfa;border-color:#0d9488"><strong>OpenClaw Gateway</strong><br><small>WebSocket API · Hot-reload config</small></div>
+          <div class="arch-arrow">↓ routing rules</div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <div class="arch-box" style="background:#f0fdfa;border-color:#0d9488;flex:1;min-width:120px">Agent A<br><small>Claude · Workspace A</small></div>
+            <div class="arch-box" style="background:#f0fdfa;border-color:#0d9488;flex:1;min-width:120px">Agent B<br><small>GPT-4o · Workspace B</small></div>
+            <div class="arch-box" style="background:#f0fdfa;border-color:#0d9488;flex:1;min-width:120px">Agent C<br><small>Gemini · Workspace C</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Installation -->
+      <div class="content-card">
+        <h2>⚡ Installation &amp; Quick Start</h2>
+        <p>OpenClaw requires Node.js 24 (or 22.14+). The fastest path is the automated installer:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash — Install &amp; Start</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># One-line installer (macOS / Linux)
+curl https://install.openclaw.ai | bash
+
+# Start the onboarding wizard (configures gateway + first agent)
+openclaw onboard --install-daemon
+
+# Verify the gateway is running
+openclaw gateway status
+
+# Open the web dashboard
+openclaw dashboard</code></pre>
+        </div>
+        <p>Alternative install methods:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash — npm / Docker</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># Via npm (global)
+npm install -g openclaw
+openclaw onboard
+
+# Via Docker
+docker run -d --name openclaw \
+  -v ~/.openclaw:/root/.openclaw \
+  -p 18789:18789 \
+  openclaw/openclaw:latest</code></pre>
+        </div>
+        <div class="callout success">
+          <div class="callout-icon">✅</div>
+          <div><strong>Hot Reload:</strong> Most configuration changes (new channels, agent prompts, tool rules) apply instantly without restarting the gateway.</div>
+        </div>
+      </div>
+
+      <!-- Configuration -->
+      <div class="content-card">
+        <h2>⚙️ Configuration</h2>
+        <p>OpenClaw is configured via <code>openclaw.json</code> (JSON5 format — supports comments). A minimal configuration with one agent and two channels:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">json — openclaw.json</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">{
+  // Default model for all agents (provider/model format)
+  "model": "anthropic/claude-opus-4",
+
+  "agents": {
+    "assistant": {
+      "prompt": "You are a helpful coding assistant.",
+      "model": "anthropic/claude-opus-4",    // per-agent override
+      "workspace": "~/openclaw/assistant",
+      "tools": {
+        "allow": ["read", "write", "web_search", "shell"]
+      }
+    },
+    "researcher": {
+      "prompt": "You are a research assistant. Focus on finding accurate information.",
+      "model": "openai/gpt-4o",
+      "workspace": "~/openclaw/researcher"
+    }
+  },
+
+  "channels": {
+    "telegram": {
+      "token": "YOUR_TELEGRAM_BOT_TOKEN",
+      "dmPolicy": "pairing",       // require pairing approval
+      "defaultAgent": "assistant"
+    },
+    "discord": {
+      "token": "YOUR_DISCORD_BOT_TOKEN",
+      "defaultAgent": "assistant",
+      "roles": {
+        "researcher-role-id": "researcher"   // role-based routing
+      }
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Multi-Agent Routing -->
+      <div class="content-card">
+        <h2>🔀 Multi-Agent Routing</h2>
+        <p>The gateway uses a deterministic <strong>priority binding</strong> system to route each message to the correct agent. Rules are evaluated top-to-bottom:</p>
+        <table class="pm-compare-table" style="width:100%;margin-bottom:16px">
+          <tr><th>Priority</th><th>Rule Type</th><th>Example</th></tr>
+          <tr><td>1 (highest)</td><td>Exact peer match</td><td>DM from user ID <code>123456</code> → Agent A</td></tr>
+          <tr><td>2</td><td>Parent peer / thread inheritance</td><td>Reply in thread bound to Agent B → Agent B</td></tr>
+          <tr><td>3</td><td>Discord role-based routing</td><td>User with <code>@researcher</code> role → researcher agent</td></tr>
+          <tr><td>4</td><td>Account ID matching</td><td>Slack workspace ID → Agent C</td></tr>
+          <tr><td>5</td><td>Channel-level fallback</td><td>All Telegram DMs → default agent</td></tr>
+          <tr><td>6 (lowest)</td><td>Global default</td><td>Everything else → <code>assistant</code></td></tr>
+        </table>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">json — Advanced routing config</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">{
+  "channels": {
+    "telegram": {
+      "token": "...",
+      "defaultAgent": "assistant",
+      "peers": {
+        // Exact user → agent binding (highest priority)
+        "telegram:user:111222333": "researcher",
+        "telegram:user:444555666": "codebot"
+      }
+    },
+    "discord": {
+      "token": "...",
+      "defaultAgent": "assistant",
+      "roles": {
+        // Discord role ID → agent mapping
+        "1234567890123456789": "researcher",
+        "9876543210987654321": "codebot"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Tools & Automation -->
+      <div class="content-card">
+        <h2>🛠️ Tools &amp; Automation</h2>
+        <p>Agents can invoke a rich set of built-in tools. Tools are scoped per-agent via allow/deny lists:</p>
+        <div class="concept-grid">
+          <div class="concept-item"><div class="concept-icon">📁</div><div><strong>File ops</strong> — read, write, edit, patch files in the agent workspace</div></div>
+          <div class="concept-item"><div class="concept-icon">🌐</div><div><strong>Web</strong> — Chromium browser automation, web search, URL fetch</div></div>
+          <div class="concept-item"><div class="concept-icon">💻</div><div><strong>Shell</strong> — Execute commands, run background processes, sandboxed Python</div></div>
+          <div class="concept-item"><div class="concept-icon">🎨</div><div><strong>Media</strong> — Image/music/video generation, text-to-speech, transcription</div></div>
+          <div class="concept-item"><div class="concept-icon">⏰</div><div><strong>Cron</strong> — Schedule recurring tasks, webhooks, heartbeat check-ins</div></div>
+          <div class="concept-item"><div class="concept-icon">🤖</div><div><strong>Sub-agents</strong> — Spawn child agents to handle parallel subtasks</div></div>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">json — Tool access control per agent</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">{
+  "agents": {
+    "safe-assistant": {
+      "tools": {
+        // Whitelist approach — only allow specific tools
+        "allow": ["read", "web_search", "send_message"]
+        // All other tools are denied
+      }
+    },
+    "power-agent": {
+      "tools": {
+        // Blacklist approach — deny only dangerous tools
+        "deny": ["shell", "browser_navigate"]
+        // All other tools are allowed
+      }
+    },
+    "sandboxed-agent": {
+      "sandbox": {
+        "enabled": true,       // Run shell commands in Docker
+        "image": "ubuntu:22.04"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+        <p>Schedule recurring tasks with cron syntax directly from agent configuration or via the CLI:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash — Cron &amp; automation</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># Add a cron job — agent runs a task every morning at 9am
+openclaw cron add "0 9 * * *" "Summarize yesterday's news" --agent assistant
+
+# List scheduled jobs
+openclaw cron list
+
+# Trigger a webhook endpoint
+openclaw webhook create --path /ingest --agent researcher</code></pre>
+        </div>
+      </div>
+
+      <!-- Memory & Sessions -->
+      <div class="content-card">
+        <h2>🧠 Memory &amp; Sessions</h2>
+        <p>OpenClaw uses a <strong>file-based memory</strong> system stored in each agent's workspace:</p>
+        <div class="concept-grid">
+          <div class="concept-item"><div class="concept-icon">📋</div><div><strong>MEMORY.md</strong> — Long-term facts, user preferences, persistent instructions the agent should always remember.</div></div>
+          <div class="concept-item"><div class="concept-icon">📅</div><div><strong>Daily notes</strong> — <code>memory/YYYY-MM-DD.md</code> files. Today's and yesterday's notes are automatically injected into context.</div></div>
+          <div class="concept-item"><div class="concept-icon">🔍</div><div><strong>Semantic search</strong> — Older memory files are retrievable via semantic search when relevant context is detected.</div></div>
+          <div class="concept-item"><div class="concept-icon">💤</div><div><strong>DREAMS.md</strong> — Optional nightly memory consolidation. The agent reflects on the day and distills insights.</div></div>
+        </div>
+        <p>Sessions can be scoped and bound to threads to maintain continuity across conversations:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">json — Session configuration</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python">{
+  "agents": {
+    "assistant": {
+      "sessions": {
+        "scope": "thread",         // Isolate per thread (vs "peer" or "channel")
+        "autoReset": "24h",        // Auto-clear context after 24 hours of inactivity
+        "threadBinding": true      // Inherit agent binding from parent thread
+      },
+      "memory": {
+        "enabled": true,
+        "dailyNotes": true,
+        "semanticSearch": true,    // Search older memory files by relevance
+        "dreams": false            // Nightly consolidation (experimental)
+      }
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Security & Deployment -->
+      <div class="content-card">
+        <h2>🔒 Security &amp; Deployment</h2>
+        <p>OpenClaw uses a <strong>personal-assistant trust model</strong> — designed for a single trusted operator managing all agents. Key security features:</p>
+        <div class="concept-grid">
+          <div class="concept-item"><div class="concept-icon">🔑</div><div><strong>Gateway auth</strong> — All clients authenticate via token or password. Config files are restricted to 600 permissions.</div></div>
+          <div class="concept-item"><div class="concept-icon">🤝</div><div><strong>DM pairing</strong> — New users must be approved via expiring one-time codes before they can interact with agents.</div></div>
+          <div class="concept-item"><div class="concept-icon">🐳</div><div><strong>Sandbox mode</strong> — Shell commands run in isolated Docker containers, preventing host system access.</div></div>
+          <div class="concept-item"><div class="concept-icon">🚫</div><div><strong>Log redaction</strong> — Sensitive tool outputs (API keys, passwords) are automatically redacted from logs.</div></div>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash — Remote deployment options</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-python"># Run security audit
+openclaw audit
+
+# SSH tunnel to remote gateway (keeps port 18789 local-only)
+ssh -N -L 18789:127.0.0.1:18789 user@your-vps
+
+# Tailscale integration (zero-config VPN — recommended for teams)
+# Just install Tailscale + run openclaw — accessible via Tailscale IP
+
+# Check gateway health
+openclaw health
+
+# Run the doctor to auto-fix common issues
+openclaw doctor</code></pre>
+        </div>
+        <div class="callout warning">
+          <div class="callout-icon">⚠️</div>
+          <div><strong>Default binding:</strong> OpenClaw binds to loopback only (<code>127.0.0.1</code>) by default. Never expose port 18789 directly to the internet — use SSH tunneling or Tailscale instead.</div>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="mod7">← Agent Systems</button>
+        <div style="display:flex;gap:10px">
+          <button class="done-btn" data-done="mod8">✓ Mark Complete</button>
           <button class="nav-btn primary" data-nav="home">🏠 Back to Home</button>
         </div>
       </div>
@@ -2667,6 +2995,7 @@ print(result["critique"])</code></pre>
   </main>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 <script src="data/questions.js"></script>

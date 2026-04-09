@@ -33,6 +33,7 @@ function safeUser(u) {
   if (!u) return null;
   const { password_hash, ...safe } = u;
   try { safe.subscription = u.subscription ? JSON.parse(u.subscription) : null; } catch { safe.subscription = null; }
+  safe.referral_balance_cents = u.referral_balance_cents || 0;
   Object.assign(safe, trialInfo(u));
   return safe;
 }
@@ -76,15 +77,45 @@ router.post('/register',
   }),
   async (req, res) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password, referralCode } = req.body;
       if (await db.findByEmail(email.trim())) {
         return res.status(409).json({ error: 'An account with this email already exists.' });
       }
       const hash = await bcrypt.hash(password, 12);
       const user = await db.createUser(name.trim(), email.toLowerCase().trim(), hash);
+
+      // Set up referral system for new user (non-fatal)
+      try {
+        await db.createReferralTable();
+
+        // Auto-generate a referral code for the new user
+        for (let i = 0; i < 10; i++) {
+          const candidate = crypto.randomBytes(4).toString('hex').toUpperCase();
+          if (!(await db.findByReferralCode(candidate))) {
+            await db.setReferralCode(user.id, candidate);
+            break;
+          }
+        }
+
+        // Credit both parties if they signed up via a referral link
+        if (referralCode) {
+          const referrer = await db.findByReferralCode(referralCode.trim().toUpperCase());
+          if (referrer && referrer.id !== user.id) {
+            const BONUS_CENTS = 2000; // $20
+            await db.insertReferral(referrer.id, user.id, BONUS_CENTS);
+            await db.addReferralBalance(referrer.id, BONUS_CENTS);
+            await db.addReferralBalance(user.id, BONUS_CENTS);
+            console.log(`🎁 Referral bonus: ${referrer.email} → ${email} ($20 each)`);
+          }
+        }
+      } catch (refErr) {
+        console.error('Referral setup error (non-fatal):', refErr.message);
+      }
+
       const token = makeToken(user.id);
+      const freshUser = await db.findById(user.id);
       console.log(`✅ Registered: ${email}`);
-      res.status(201).json({ token, user: safeUser(user) });
+      res.status(201).json({ token, user: safeUser(freshUser) });
     } catch (err) {
       console.error('Register error:', err);
       res.status(500).json({ error: 'Registration failed. Please try again.' });
@@ -188,6 +219,7 @@ router.get('/credits', authMiddleware, async (req, res) => {
   res.json({
     credits: user.credits,
     subscription: user.subscription ? JSON.parse(user.subscription) : null,
+    referral_balance_cents: user.referral_balance_cents || 0,
     transactions,
   });
 });

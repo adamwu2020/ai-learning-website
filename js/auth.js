@@ -7,7 +7,20 @@
 const API = (location.hostname === 'localhost' && location.port === '5500')
   ? 'http://localhost:3001/api'
   : '/api';
-const TOKEN_KEY = 'ai-learn-token';
+const TOKEN_KEY    = 'ai-learn-token';
+const REFERRAL_KEY = 'ai-learn-ref';
+
+// Capture ?ref=CODE from URL and persist it for registration
+(function captureReferralCode() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) {
+    sessionStorage.setItem(REFERRAL_KEY, ref.trim().toUpperCase());
+    // Remove ?ref= from URL without reload
+    const clean = window.location.pathname + window.location.hash;
+    history.replaceState(null, '', clean);
+  }
+}());
 
 // ── State ──────────────────────────────────────────────────
 let currentUser = null;
@@ -70,9 +83,10 @@ async function initAuth() {
 async function syncCreditsFromServer() {
   if (!currentUser) return;
   try {
-    const { credits, subscription } = await apiFetch('/auth/credits');
+    const { credits, subscription, referral_balance_cents } = await apiFetch('/auth/credits');
     currentUser.credits = credits;
     if (subscription !== undefined) currentUser.subscription = subscription;
+    if (referral_balance_cents !== undefined) currentUser.referral_balance_cents = referral_balance_cents;
     updateCreditDisplay();
     updateTrialBadge();
   } catch { /* offline */ }
@@ -304,10 +318,15 @@ async function handleLogin(e) {
 
 // ── Register Form ──────────────────────────────────────────
 function renderRegisterForm() {
+  const pendingRef = sessionStorage.getItem(REFERRAL_KEY);
+  const refBanner  = pendingRef
+    ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#166534">🎁 <strong>Referral code applied!</strong> You'll get <strong>$20 credit</strong> when you sign up.</div>`
+    : '';
   return `
     <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
       <h2 class="auth-title">Create your account</h2>
       <p class="auth-sub">Free to join — start learning AI today</p>
+      ${refBanner}
 
       <div class="auth-field">
         <label>Full Name</label>
@@ -363,10 +382,12 @@ async function handleRegister(e) {
   errEl.style.display = 'none';
 
   try {
+    const referralCode = sessionStorage.getItem(REFERRAL_KEY) || undefined;
     const { token, user } = await apiFetch('/auth/register', {
       method: 'POST',
-      body: { name, email, password },
+      body: { name, email, password, ...(referralCode ? { referralCode } : {}) },
     });
+    sessionStorage.removeItem(REFERRAL_KEY); // consumed
     localStorage.setItem(TOKEN_KEY, token);
     currentUser = user;
     await syncCreditsFromServer();

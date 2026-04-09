@@ -11,10 +11,11 @@ const MODULES = [
   { id: 'mod5',      label: 'RL with LLM-as-Judge',    icon: '🏆', num: 'Module 05' },
   { id: 'mod6',      label: 'RAG Systems',             icon: '🔍', num: 'Module 06' },
   { id: 'mod7',      label: 'Agent Systems',           icon: '🕸️', num: 'Module 07' },
+  { id: 'mod8',      label: 'OpenClaw',                icon: '🦀', num: 'Module 08' },
   { id: 'interview', label: 'Mock Interview',          icon: '🎯', num: 'Practice', special: true },
 ];
 
-const GATED_IDS = new Set(['mod1','mod2','mod3','mod4','mod5','mod6','mod7','interview']);
+const GATED_IDS = new Set(['mod1','mod2','mod3','mod4','mod5','mod6','mod7','mod8','interview']);
 
 
 let completed = new Set(JSON.parse(localStorage.getItem('ai-learn-completed') || '[]'));

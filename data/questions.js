@@ -1,6 +1,6 @@
 // ============================================================
 //  AI Learning Website — Interview Question Bank
-//  7 Modules × 50 Questions = 350 Questions Total
+//  8 Modules × 50/30 Questions = 380 Questions Total
 // ============================================================
 
 const QUESTION_BANK = {
@@ -1438,6 +1438,130 @@ const QUESTION_BANK = {
     { id:"m7q50", difficulty:"hard", tags:["production","scaling"],
       q:"What architecture would you design for a production multi-agent system handling 10,000 concurrent sessions?",
       a:"Architecture: (1) Stateless agent API: agent logic in horizontally scalable microservices (Kubernetes). (2) State persistence: LangGraph with Postgres checkpointer — all state in DB, any instance can resume any session. (3) Async tool execution: tool calls via async workers (Celery/Redis or cloud functions) — don't block agent processes. (4) Message queue: Kafka for high-throughput tool result delivery. (5) LLM load balancing: round-robin across multiple API keys or on-premise model replicas. (6) Tool result caching: Redis for frequently-requested tool outputs. (7) Observability: OpenTelemetry tracing, Prometheus metrics, LangSmith for LLM-specific traces. (8) Cost controls: per-session token budgets enforced at middleware layer." },
+  ],
+  // ══════════════════════════════════════════════════════════
+  //  MODULE 8 — OpenClaw (30 questions)
+  // ══════════════════════════════════════════════════════════
+  mod8: [
+    { id:"m8q1", difficulty:"easy", tags:["fundamentals"],
+      q:"What is OpenClaw and what problem does it solve?",
+      a:"OpenClaw is a self-hosted, MIT-licensed multi-channel AI gateway that connects 26+ messaging platforms (Discord, Slack, Telegram, WhatsApp, iMessage, Signal, Teams, and more) to AI coding agents. It solves the problem of building and maintaining separate integrations for each messaging platform — instead, you configure once and route messages from any channel to the appropriate AI agent. It uses a 'personal-assistant trust model' designed for a single operator managing multiple agents on one machine." },
+
+    { id:"m8q2", difficulty:"easy", tags:["architecture"],
+      q:"What are the four primary primitives in OpenClaw's architecture?",
+      a:"(1) Gateway — the central long-lived daemon that maintains persistent connections to all messaging platforms and exposes a WebSocket API. (2) Agents — isolated AI entities with separate workspaces, authentication contexts, and session stores; each can use a different LLM provider. (3) Channels — adapters for 26+ messaging platforms that route incoming messages to agents. (4) Tools — functions agents can invoke including file operations, web browsing, shell commands, media generation, cron scheduling, and device capabilities." },
+
+    { id:"m8q3", difficulty:"easy", tags:["installation"],
+      q:"What are the system requirements and installation methods for OpenClaw?",
+      a:"OpenClaw requires Node.js 24 or 22.14+. Installation methods: (1) Automated installer: curl https://install.openclaw.ai | bash. (2) npm global: npm install -g openclaw. (3) Docker: docker run openclaw/openclaw:latest with a volume mount for config. (4) Source build from GitHub. After installation, run 'openclaw onboard --install-daemon' to configure the gateway via an interactive wizard. Most config changes support hot-reload without restarting the gateway." },
+
+    { id:"m8q4", difficulty:"easy", tags:["configuration"],
+      q:"What format does OpenClaw use for configuration and what are the main top-level sections?",
+      a:"OpenClaw uses JSON5 format (supports comments) for openclaw.json. Main sections: 'model' — default LLM provider/model string (e.g., 'anthropic/claude-opus-4'); 'agents' — map of named agent definitions each with prompt, model override, workspace path, tools config, and session settings; 'channels' — map of channel configs (telegram, discord, slack, etc.) each with credentials, dmPolicy, and defaultAgent." },
+
+    { id:"m8q5", difficulty:"easy", tags:["channels"],
+      q:"What is a 'dmPolicy' in OpenClaw and what are the available options?",
+      a:"dmPolicy controls how the gateway handles direct messages from new users. Options: 'pairing' (default) — new users must complete a pairing approval with an expiring one-time code; 'allowlist' — only pre-approved user IDs can DM; 'open' — any user can start a conversation without approval; 'disabled' — DMs are rejected. The 'pairing' default is recommended as it prevents arbitrary users from accessing your agents." },
+
+    { id:"m8q6", difficulty:"medium", tags:["routing"],
+      q:"Explain OpenClaw's multi-agent routing priority system.",
+      a:"Deterministic priority-based binding evaluated in order: (1) Exact peer match — specific user ID bound to an agent (highest priority). (2) Parent peer/thread inheritance — inherit binding from parent thread. (3) Discord role-based routing — map Discord role IDs to agents. (4) Account ID matching — route by platform workspace ID. (5) Channel-level fallback — defaultAgent in channel config. (6) Global default — gateway's default agent. This cascade makes routing predictable and debuggable." },
+
+    { id:"m8q7", difficulty:"medium", tags:["agents"],
+      q:"How do you create multiple isolated agents and what does isolation mean in OpenClaw?",
+      a:"Define multiple named entries under the 'agents' key in openclaw.json, each with its own prompt, model, workspace directory, tools config, and session settings. Isolation means: separate filesystem workspaces, independent session/conversation history, separate authentication credentials, independent tool allow/deny lists, and optionally separate Docker sandboxes. One agent's actions, memory, and context cannot bleed into another's, enabling specialized agents (researcher, codebot, etc.) on the same gateway." },
+
+    { id:"m8q8", difficulty:"medium", tags:["tools"],
+      q:"What is the difference between an allow list and a deny list for agent tools?",
+      a:"Allow list (whitelist): only the specified tools are available; all others are blocked. Use for minimal attack surface — e.g., a customer-facing agent allowed only to read files and search the web. Deny list (blacklist): all tools are available except the listed ones. Use when you want broad capability but need to block specific dangerous tools — e.g., deny 'shell' and 'browser' for an agent handling untrusted input. Best practice: start with an allow list for production agents." },
+
+    { id:"m8q9", difficulty:"medium", tags:["memory"],
+      q:"Describe OpenClaw's file-based memory system.",
+      a:"OpenClaw uses markdown files in each agent's workspace: MEMORY.md stores long-term facts always injected into context. Daily notes (memory/YYYY-MM-DD.md) capture today's and yesterday's context automatically; older notes are retrievable via semantic search. DREAMS.md (optional) enables nightly consolidation where the agent distills insights from daily notes. Session autoReset clears conversational context without clearing memory files, balancing continuity with token cost management." },
+
+    { id:"m8q10", difficulty:"medium", tags:["sessions"],
+      q:"What session scoping options does OpenClaw provide?",
+      a:"Three session scopes: 'thread' — each thread gets isolated context, no history sharing across threads. 'peer' — context shared per user across all their conversations; agent remembers the user across threads. 'channel' — all users in a channel share one context (useful for group decision-making bots). Additional settings: autoReset (e.g., '24h') clears context after inactivity; threadBinding inherits agent routing from parent thread. Different agents can use different scopes." },
+
+    { id:"m8q11", difficulty:"medium", tags:["providers"],
+      q:"How does OpenClaw handle multiple LLM providers?",
+      a:"OpenClaw supports 35+ providers using 'provider/model' strings: 'anthropic/claude-opus-4', 'openai/gpt-4o', 'google/gemini-2.0-flash', 'groq/llama-3.1-70b', 'ollama/llama3.2' (local). Each agent can use a different provider by overriding the global default. Provider API keys are set in config or environment variables. Fallback models can be configured: if the primary fails (rate limit, outage), OpenClaw retries with the fallback automatically." },
+
+    { id:"m8q12", difficulty:"medium", tags:["security"],
+      q:"What is OpenClaw's personal-assistant trust model?",
+      a:"The model assumes a single trusted operator controls the entire gateway — no multi-tenant isolation between operators. Security boundaries: (1) External users blocked unless approved via DM pairing. (2) Tool allow/deny lists restrict agent capabilities. (3) Docker sandboxing for command execution. (4) Loopback-only binding — gateway never directly exposed to the internet. (5) Log redaction hides sensitive data. This model suits personal use or small trusted teams, but is NOT designed for multi-tenant SaaS where different operators must be isolated." },
+
+    { id:"m8q13", difficulty:"medium", tags:["deployment"],
+      q:"What are the recommended approaches for remote access to an OpenClaw gateway?",
+      a:"OpenClaw binds to 127.0.0.1 by default — never expose port 18789 publicly. Options: (1) SSH tunneling: ssh -N -L 18789:127.0.0.1:18789 user@host. (2) Tailscale (recommended for teams): zero-config private VPN, accessible via Tailscale IP. (3) VPS with SSH tunnel. Avoid: direct port forwarding, nginx reverse proxy without auth, or any public exposure of the WebSocket API." },
+
+    { id:"m8q14", difficulty:"hard", tags:["architecture"],
+      q:"What are the trade-offs of OpenClaw's single-machine gateway architecture?",
+      a:"Advantages: Simplicity, low latency, easy JSON config with hot-reload, no infrastructure costs. Limitations: No horizontal scaling — single machine handles all channels; single point of failure; no built-in HA/failover; file-based memory doesn't scale to millions of entries. For personal/small team use (dozens of concurrent users) single-machine is sufficient. For enterprise scale you'd need a message broker, distributed session storage, and multiple gateway instances — at which point OpenClaw's architecture would need significant custom extension." },
+
+    { id:"m8q15", difficulty:"hard", tags:["automation","design"],
+      q:"Design an OpenClaw setup for a dev team with specialized agents for code review, research, and DevOps.",
+      a:"Three agents: (1) 'code-reviewer' — allow: [read, web_search, send_message]; model: gpt-4o; session: thread (per PR). (2) 'researcher' — allow: [read, web_search, browser, send_message]; model: claude-opus; memory enabled. (3) 'devops' — allow: [read, shell, send_message]; sandbox: Docker; model: any fast model. Routing: Discord roles map @developer → code-reviewer, @research → researcher, @ops → devops. Channels: Slack + GitHub webhook (PR events → code-reviewer) + PagerDuty webhook (alerts → devops). Security: Tailscale for team access, dmPolicy pairing, regular audit runs." },
+
+    { id:"m8q16", difficulty:"easy", tags:["cli"],
+      q:"What are the key OpenClaw CLI commands for day-to-day operations?",
+      a:"'openclaw gateway status' — check daemon. 'openclaw dashboard' — open web UI. 'openclaw health' — check all channels and agents. 'openclaw doctor' — auto-fix common issues. 'openclaw agent list' — show configured agents. 'openclaw cron list' — show scheduled jobs. 'openclaw audit' — security compliance check. 'openclaw logs' — tail gateway logs. 'openclaw update' — update to latest version." },
+
+    { id:"m8q17", difficulty:"medium", tags:["channels"],
+      q:"What is mention-gating in OpenClaw and why is it important for group chats?",
+      a:"Mention-gating means agents in group chats only respond when directly mentioned (e.g., @bot). In DMs agents respond to every message. Without mention-gating in a busy group, the agent would respond to every conversation, disrupting the group and consuming tokens on irrelevant messages. It also prevents the agent from passively collecting private group conversations. You can disable mention-gating for specific channels where always-on behavior is desired, but this is not recommended for high-traffic groups." },
+
+    { id:"m8q18", difficulty:"hard", tags:["tools"],
+      q:"Explain OpenClaw's sub-agent system and when to use it.",
+      a:"Sub-agents let an agent spawn child agents for parallel subtasks via the 'spawn_agent' tool call. The child runs in its own context (separate workspace, session, tools), completes the task, and returns results. Use cases: (1) Parallel research — spawn 3 sub-agents to search different topics simultaneously. (2) Specialization — general agent spawns a code-review sub-agent. (3) Long-running tasks — offload multi-hour processes while parent stays responsive. Key consideration: sub-agents consume tokens and compute — design tasks so the parallelism/specialization benefit justifies the overhead." },
+
+    { id:"m8q19", difficulty:"medium", tags:["plugins"],
+      q:"What are OpenClaw plugins and what can they add?",
+      a:"Plugins bundle new channels (messaging platform adapters), model providers (new LLM backends), tools (new agent capabilities), and media handlers. Installed with 'openclaw plugin install <name>'. Examples: a plugin adding support for a new messaging app, a custom database connector tool, or specialized media processing. Skills (markdown guides injected into agent prompts) can also be packaged as plugins. The plugin API exposes the same primitives as built-in features." },
+
+    { id:"m8q20", difficulty:"medium", tags:["nodes"],
+      q:"What are OpenClaw Nodes?",
+      a:"Nodes are companion devices (macOS app, iOS, Android) paired with the gateway that act as peripherals. Once paired, agents can invoke: camera access, push notifications, GPS location, SMS (platform-dependent), system commands on the device OS, and canvas UI rendering. Nodes connect via WebSocket and expose capabilities as tools. Example: a monitoring agent that captures a macOS desktop screenshot every hour, analyzes it, and sends a Slack notification if an anomaly is detected." },
+
+    { id:"m8q21", difficulty:"easy", tags:["fundamentals"],
+      q:"Name five LLM providers supported by OpenClaw and their model string format.",
+      a:"Provider strings use 'provider/model' format: (1) Anthropic — 'anthropic/claude-opus-4'. (2) OpenAI — 'openai/gpt-4o'. (3) Google — 'google/gemini-2.0-flash'. (4) Groq (fast inference) — 'groq/llama-3.1-70b'. (5) Ollama (local/self-hosted) — 'ollama/llama3.2'. Also: DeepSeek — 'deepseek/deepseek-chat'; vLLM — 'vllm/mistral-7b'. Local providers enable fully offline operation without sending data to cloud APIs." },
+
+    { id:"m8q22", difficulty:"hard", tags:["security"],
+      q:"What steps harden an OpenClaw deployment for sensitive data?",
+      a:"Checklist: (1) Run 'openclaw audit'. (2) Set dmPolicy to 'pairing' or 'allowlist' on all channels. (3) Per-agent tool allow lists (least privilege). (4) Enable Docker sandbox for shell-executing agents. (5) chmod 600 openclaw.json. (6) Use SSH tunnel or Tailscale — never bind port 18789 publicly. (7) Set strong gateway authentication token. (8) Enable log redaction. (9) Separate agent workspaces with filesystem permissions. (10) Rotate LLM provider API keys regularly." },
+
+    { id:"m8q23", difficulty:"medium", tags:["skills"],
+      q:"What are Skills in OpenClaw and how do they differ from tools?",
+      a:"Tools are executable functions agents call (file read, web search, shell command). Skills are markdown guides injected into the agent's system prompt that shape behavior and judgment — they teach the agent when and how to use tools effectively. Example: a 'web-research' skill instructs 'always search 3 sources, cross-reference claims, cite URLs.' Skills are lightweight alternatives to fine-tuning for encoding domain expertise. They compose well — combine multiple skills to create specialized agent personalities. Skills can also be distributed as plugins." },
+
+    { id:"m8q24", difficulty:"medium", tags:["operations"],
+      q:"How do you diagnose issues with OpenClaw using built-in tools?",
+      a:"'openclaw health' — checks gateway status, all channel connections, and agent availability. 'openclaw doctor' — auto-detects and fixes: missing config fields, daemon not running, stale processes, permission issues. 'openclaw logs --follow' — real-time log streaming for debugging routing and tool execution. 'openclaw config validate' — validates config syntax and routing rules. Common issues: channel disconnected (check token/network), agent not responding (check provider API key/quota), tool failing (check Docker running for sandboxed agents, file permissions)." },
+
+    { id:"m8q25", difficulty:"hard", tags:["memory"],
+      q:"How would you design a memory strategy for a long-running personal assistant agent?",
+      a:"Strategy: (1) MEMORY.md — curate under 2,000 tokens with sections: User Profile, Ongoing Projects, Important Facts. Remove stale entries regularly. (2) Daily notes — auto-accumulate; agent loads today+yesterday automatically, older notes retrieved by semantic search only when relevant. (3) Enable DREAMS consolidation — nightly distillation of daily notes into MEMORY.md prevents unbounded growth. (4) Project-specific context files — PROJECT.md for large ongoing work. (5) 48h session autoReset — clear conversational noise while preserving memory files. (6) Quarterly audits — archive/delete irrelevant historical memory." },
+
+    { id:"m8q26", difficulty:"easy", tags:["channels"],
+      q:"Name five messaging platforms OpenClaw supports and a unique setup requirement for each.",
+      a:"(1) Telegram — BotFather token; DM pairing with approval codes. (2) Discord — Developer Portal app + bot permissions; supports role-based routing. (3) Slack — App with Socket Mode + OAuth token; workspace ID used for routing. (4) WhatsApp — QR code scan for auth (like WhatsApp Web). (5) iMessage — macOS only; pairs with Companion app, uses Apple ID of the machine. Others: Signal, Teams, WeChat, LINE, Twitch chat, Matrix, Nostr." },
+
+    { id:"m8q27", difficulty:"medium", tags:["automation"],
+      q:"How does OpenClaw's webhook system work and what are typical use cases?",
+      a:"Create webhook endpoints with 'openclaw webhook create --path /ingest --agent researcher'. The gateway listens for POST requests, passes the body to the agent as a message. Use cases: (1) CI/CD — GitHub Actions posts build failures; agent triages and files issues. (2) Monitoring — Grafana alert triggers agent investigation and Slack notification. (3) Form submissions — web form posts to OpenClaw; agent processes and responds via another channel. (4) IoT events — smart home state changes trigger agent actions. Webhooks can return agent responses synchronously for request-response patterns." },
+
+    { id:"m8q28", difficulty:"hard", tags:["architecture"],
+      q:"Compare OpenClaw's approach to multi-channel deployment with building custom integrations.",
+      a:"Custom per-platform: Full control, platform-specific optimization. But N×M complexity (N platforms × M agents), separate auth, format normalization, rate limit handling, reconnection logic per platform — very high maintenance. OpenClaw: Single config, unified routing, shared agent logic, one daemon to monitor. Trade-offs: some platform-specific features may not be exposed; dependency on OpenClaw for platform API updates. For teams with 3+ platforms and multiple agents, OpenClaw wins on developer-time savings and operational simplicity." },
+
+    { id:"m8q29", difficulty:"medium", tags:["configuration"],
+      q:"What is hot-reload in OpenClaw and which changes support it?",
+      a:"Hot-reload applies config changes to the running gateway without restart. Supports: agent prompt updates, tool allow/deny changes, new agent definitions, session config, skill additions, cron modifications, new webhook endpoints. Requires restart: gateway port changes, channel token changes (needs reconnection), major plugin additions. Works via file watcher on openclaw.json. This enables fast iteration — update a prompt, save, and the next message uses the new prompt immediately with zero downtime." },
+
+    { id:"m8q30", difficulty:"hard", tags:["production"],
+      q:"Design a production OpenClaw deployment for a software team needing automated code review, documentation, and incident response.",
+      a:"Three agents: (1) 'code-reviewer' — allow:[read, web_search, send_message], model: gpt-4o, session: thread (per PR). (2) 'doc-writer' — allow:[read, write, web_search, shell(sandboxed)], model: claude, memory enabled for project conventions. (3) 'incident-responder' — allow:[read-logs, send_message, web_search], model: groq (fast), no write/shell. Channels: Slack (role routing to all three), GitHub webhook → code-reviewer on PRs, PagerDuty → incident-responder on alerts. Security: Tailscale for team access, all sandboxed, allowlist policy, weekly audit. Monitoring: cron health check every 5 minutes with self-alert via incident-responder if gateway degrades." },
   ],
 };
 
