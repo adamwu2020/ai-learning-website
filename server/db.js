@@ -42,6 +42,24 @@ const db = {
   `, [userId, course, module, lesson]),
   getUserProgress: (userId) => pool.query('SELECT * FROM user_progress WHERE user_id = $1 ORDER BY completed_at DESC', [userId]).then(r => r.rows),
 
+  // ── Coupons ──────────────────────────────────────────────
+  createCouponsTable: () => pool.query(`
+    CREATE TABLE IF NOT EXISTS coupons (
+      id         SERIAL PRIMARY KEY,
+      code       TEXT UNIQUE NOT NULL,
+      days       INTEGER NOT NULL CHECK (days >= 1 AND days <= 10000),
+      expires_at TIMESTAMPTZ,
+      used_count INTEGER DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `),
+  getCoupons:          ()                         => pool.query('SELECT * FROM coupons ORDER BY created_at DESC').then(r => r.rows),
+  getCouponByCode:     (code)                     => pool.query('SELECT * FROM coupons WHERE UPPER(code) = UPPER($1)', [code]).then(r => r.rows[0] ?? null),
+  createCoupon:        (code, days, expiresAt)    => pool.query('INSERT INTO coupons (code, days, expires_at) VALUES (UPPER($1), $2, $3) RETURNING *', [code, days, expiresAt || null]).then(r => r.rows[0]),
+  updateCoupon:        (id, days, expiresAt)      => pool.query('UPDATE coupons SET days = $1, expires_at = $2 WHERE id = $3 RETURNING *', [days, expiresAt || null, id]).then(r => r.rows[0]),
+  deleteCoupon:        (id)                       => pool.query('DELETE FROM coupons WHERE id = $1', [id]),
+  incrementCouponUsed: (code)                     => pool.query('UPDATE coupons SET used_count = used_count + 1 WHERE UPPER(code) = UPPER($1)', [code]),
+
   // ── Admin ────────────────────────────────────────────────
   findAdminUser:   ()                    => pool.query('SELECT id FROM users WHERE is_admin = TRUE LIMIT 1').then(r => r.rows[0] ?? null),
   createAdminUser: (name, email, hash)   => pool.query(`
@@ -50,8 +68,18 @@ const db = {
     ON CONFLICT (email) DO UPDATE SET is_admin = TRUE, password_hash = EXCLUDED.password_hash
   `, [name, email, hash]),
   findAllUsers:    ()      => pool.query(`
-    SELECT id, name, email, credits, subscription, created_at, last_login, is_admin, disabled
-    FROM users ORDER BY created_at DESC
+    SELECT u.id, u.name, u.email, u.credits, u.subscription, u.created_at, u.last_login, u.is_admin, u.disabled,
+      COALESCE(p.lessons_completed, 0) AS lessons_completed,
+      COALESCE(p.courses_count, 0) AS courses_count
+    FROM users u
+    LEFT JOIN (
+      SELECT user_id,
+        COUNT(*) AS lessons_completed,
+        COUNT(DISTINCT course) AS courses_count
+      FROM user_progress
+      GROUP BY user_id
+    ) p ON p.user_id = u.id
+    ORDER BY u.created_at DESC
   `).then(r => r.rows),
   setUserDisabled: (id, v) => pool.query('UPDATE users SET disabled = $1 WHERE id = $2', [v, id]),
   deleteUser:      (id)    => pool.query('DELETE FROM users WHERE id = $1', [id]),
@@ -60,7 +88,9 @@ const db = {
       COUNT(*)                                                     AS total_users,
       COUNT(CASE WHEN subscription IS NOT NULL THEN 1 END)         AS subscribed_users,
       COUNT(CASE WHEN disabled = TRUE THEN 1 END)                  AS disabled_users,
-      COALESCE(SUM(credits), 0)                                    AS total_credits
+      COALESCE(SUM(credits), 0)                                    AS total_credits,
+      (SELECT COUNT(*) FROM user_progress)                         AS total_lessons_completed,
+      (SELECT COUNT(DISTINCT user_id) FROM user_progress)          AS active_learners
     FROM users WHERE is_admin = FALSE
   `).then(r => r.rows[0]),
 };

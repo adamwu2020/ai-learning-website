@@ -34,25 +34,27 @@ function openInterviewSetup() {
 }
 
 function renderInterviewSetup() {
-  const credits = (typeof getCreditsValue === 'function') ? getCreditsValue() : getCredits();
-  const hasCredits = credits >= INTERVIEW_COST_CREDITS;
+  const credits    = (typeof getCreditsValue === 'function') ? getCreditsValue() : getCredits();
+  const subscribed = (typeof hasActiveSubscription === 'function') && hasActiveSubscription();
+  const hasCredits = subscribed || credits >= INTERVIEW_COST_CREDITS;
 
   document.getElementById('interview-content').innerHTML = `
     <div class="iv-setup-hero">
       <div class="iv-hero-icon">🎯</div>
       <h1>Mock Interview</h1>
-      <p>Practice with ${QUESTIONS_PER_INTERVIEW} randomly sampled questions. Get instant model answers to compare with your own. Each session costs <strong>${INTERVIEW_COST_CREDITS} credits</strong>.</p>
+      <p>Practice with ${QUESTIONS_PER_INTERVIEW} randomly sampled questions. Get instant model answers to compare with your own.${subscribed ? ' <strong>Included in your subscription.</strong>' : ` Each session costs <strong>${INTERVIEW_COST_CREDITS} credits</strong>.`}</p>
     </div>
 
     <div class="iv-credit-bar">
       <div class="iv-credit-info">
-        <span>💰 Your balance:</span>
-        <strong class="credit-balance">${credits} credits</strong>
-        ${!hasCredits ? '<span class="iv-low-credit">— Need 50 more credits to start</span>' : ''}
+        ${subscribed
+          ? `<span>✅ Active subscription — mock interviews included</span>`
+          : `<span>💰 Your balance:</span>
+             <strong class="credit-balance">${credits} credits</strong>
+             ${!hasCredits ? '<span class="iv-low-credit">— Need 50 more credits to start</span>' : ''}`
+        }
       </div>
-      <button class="iv-buy-btn" onclick="openPaymentModal()">
-        ${hasCredits ? '+ Buy More' : '🔒 Buy Credits'}
-      </button>
+      ${!subscribed ? `<button class="iv-buy-btn" onclick="openPaymentModal()">${hasCredits ? '+ Buy More' : '🔒 Buy Credits'}</button>` : ''}
     </div>
 
     <div class="iv-setup-grid">
@@ -97,20 +99,17 @@ function renderInterviewSetup() {
         </div>
 
         <div class="iv-cost-box">
-          <div class="iv-cost-row">
-            <span>Session cost</span>
-            <strong>${INTERVIEW_COST_CREDITS} credits</strong>
-          </div>
-          <div class="iv-cost-row">
-            <span>Your balance</span>
-            <strong class="credit-balance" style="color:${hasCredits ? 'var(--success)' : 'var(--danger)'}">${credits} credits</strong>
-          </div>
-          ${hasCredits ? `<div class="iv-cost-row"><span>After session</span><strong>${credits - INTERVIEW_COST_CREDITS} credits</strong></div>` : ''}
+          ${subscribed
+            ? `<div class="iv-cost-row"><span>Session cost</span><strong style="color:var(--success)">✓ Covered by subscription</strong></div>`
+            : `<div class="iv-cost-row"><span>Session cost</span><strong>${INTERVIEW_COST_CREDITS} credits</strong></div>
+               <div class="iv-cost-row"><span>Your balance</span><strong class="credit-balance" style="color:${hasCredits ? 'var(--success)' : 'var(--danger)'}">${credits} credits</strong></div>
+               ${hasCredits ? `<div class="iv-cost-row"><span>After session</span><strong>${credits - INTERVIEW_COST_CREDITS} credits</strong></div>` : ''}`
+          }
         </div>
 
         <button id="startInterviewBtn" class="iv-start-btn ${!hasCredits ? 'iv-start-locked' : ''}"
           onclick="${hasCredits ? 'startInterview()' : 'openPaymentModal()'}">
-          ${hasCredits ? '🚀 Start Mock Interview' : '🔒 Purchase Credits to Start'}
+          ${hasCredits ? '🚀 Start Mock Interview' : '🔒 Purchase Subscription to Start'}
         </button>
       </div>
     </div>
@@ -128,12 +127,12 @@ function renderInterviewSetup() {
 
 // ── Start Interview ────────────────────────────────────────
 async function startInterview() {
-  // Deduct credits (server-aware when logged in)
-  const deduct = (typeof serverDeductCredits === 'function') ? serverDeductCredits : deductCredits;
-  const ok = await deduct(INTERVIEW_COST_CREDITS, 'Mock interview session');
-  if (!ok) {
-    openPaymentModal();
-    return;
+  // Subscribers (including coupon trial) get free mock interviews
+  const subscribed = (typeof hasActiveSubscription === 'function') && hasActiveSubscription();
+  if (!subscribed) {
+    const deduct = (typeof serverDeductCredits === 'function') ? serverDeductCredits : deductCredits;
+    const ok = await deduct(INTERVIEW_COST_CREDITS, 'Mock interview session');
+    if (!ok) { openPaymentModal(); return; }
   }
 
   const moduleId  = document.querySelector('input[name="moduleSelect"]:checked')?.value || 'all';
@@ -242,16 +241,17 @@ function renderQuestion() {
   document.getElementById('userAnswer').focus();
 }
 
-// ── Submit Answer → Show Model Answer ─────────────────────
-function submitAnswer() {
+// ── Submit Answer → GPT Grading → Show Result ─────────────
+async function submitAnswer() {
   clearInterval(interviewState.timerInterval);
   const answer = document.getElementById('userAnswer')?.value.trim() || '';
   const q = interviewState.questions[interviewState.currentIdx];
 
-  // Store answer temporarily
   interviewState._pendingAnswer = answer;
 
-  // Show model answer with self-rating
+  const isLast = interviewState.currentIdx + 1 >= interviewState.questions.length;
+
+  // Show answers + loading state while GPT grades
   document.getElementById('interview-content').innerHTML = `
     <div class="iv-reveal-card">
       <div class="iv-reveal-header">
@@ -270,34 +270,64 @@ function submitAnswer() {
         </div>
       </div>
 
-      <div class="iv-rating-section">
-        <div class="iv-rating-label">How well did you answer? (Self-rate 1–5)</div>
-        <div class="iv-stars">
-          ${[1,2,3,4,5].map(n => `
-            <button class="iv-star" data-rating="${n}" onclick="selectRating(${n})" title="${['Poor','Fair','Good','Very Good','Excellent'][n-1]}">
-              <span class="iv-star-num">${n}</span>
-              <span class="iv-star-label">${['Poor','Fair','Good','Very Good','Excellent'][n-1]}</span>
-            </button>
-          `).join('')}
+      <div id="iv-grade-section" class="iv-grade-section">
+        <div class="iv-grade-loading">
+          <span class="iv-grade-spinner"></span> Grading your answer with AI…
         </div>
       </div>
 
       <div id="iv-next-section" style="display:none;margin-top:16px;text-align:center">
         <button class="iv-submit-btn" onclick="nextQuestion()">
-          ${interviewState.currentIdx + 1 < interviewState.questions.length ? 'Next Question →' : 'See Results 🏆'}
+          ${isLast ? 'See Results 🏆' : 'Next Question →'}
         </button>
       </div>
     </div>
   `;
+
+  // Call grading API
+  try {
+    const data = await apiFetch('/interview/grade', {
+      method: 'POST',
+      body: { question: q.q, userAnswer: answer, groundTruth: q.a },
+    });
+    interviewState._pendingRating = data.score;
+    renderGradeResult(data.score, data.feedback);
+  } catch (err) {
+    interviewState._pendingRating = 0;
+    renderGradeResult(null, err.message);
+  }
 }
 
-function selectRating(n) {
-  document.querySelectorAll('.iv-star').forEach(b => {
-    const r = parseInt(b.dataset.rating);
-    b.classList.toggle('selected', r <= n);
-    b.classList.toggle('active', r === n);
-  });
-  interviewState._pendingRating = n;
+function renderGradeResult(score, feedback) {
+  const gradeEl = document.getElementById('iv-grade-section');
+  if (!gradeEl) return;
+
+  const scoreColors = { 5:'#10b981', 4:'#6366f1', 3:'#f59e0b', 2:'#f97316', 1:'#ef4444', 0:'#94a3b8' };
+  const scoreLabels = { 5:'Excellent', 4:'Very Good', 3:'Good', 2:'Fair', 1:'Poor', 0:'Not Scored' };
+
+  if (score === null) {
+    gradeEl.innerHTML = `
+      <div class="iv-grade-error">
+        ⚠️ AI grading unavailable: ${feedback}
+      </div>`;
+  } else {
+    const color = scoreColors[score] || '#94a3b8';
+    const label = scoreLabels[score] || '';
+    gradeEl.innerHTML = `
+      <div class="iv-grade-result">
+        <div class="iv-grade-score-row">
+          <div class="iv-grade-score-badge" style="background:${color}18;border:2px solid ${color};color:${color}">
+            <span class="iv-grade-num">${score}</span><span class="iv-grade-denom">/5</span>
+          </div>
+          <div class="iv-grade-label" style="color:${color}">${label}</div>
+        </div>
+        <div class="iv-grade-feedback">
+          <div class="iv-grade-feedback-title">AI Feedback</div>
+          <div class="iv-grade-feedback-text">${feedback}</div>
+        </div>
+      </div>`;
+  }
+
   document.getElementById('iv-next-section').style.display = 'block';
 }
 
@@ -385,7 +415,7 @@ function showResults() {
       <div class="iv-results-stats">
         <div class="iv-stat-box">
           <div class="iv-stat-val">${avgRating}</div>
-          <div class="iv-stat-label">Avg Self-Rating</div>
+          <div class="iv-stat-label">Avg AI Score</div>
         </div>
         <div class="iv-stat-box">
           <div class="iv-stat-val">${questions.length - skipped}</div>
@@ -407,7 +437,7 @@ function showResults() {
       </div>
 
       <div class="iv-results-card">
-        <h3>Question Review</h3>
+        <h3>Question Review <span style="font-size:13px;font-weight:400;color:#64748b">— AI scored</span></h3>
         <div class="iv-review-list">
           ${answers.map((a, i) => {
             const colors = {5:'#10b981', 4:'#6366f1', 3:'#f59e0b', 2:'#f97316', 1:'#ef4444', 0:'#94a3b8'};

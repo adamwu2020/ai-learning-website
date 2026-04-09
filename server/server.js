@@ -6,7 +6,7 @@
 // Force IPv4 DNS — Render free tier cannot reach Supabase over IPv6
 require('dns').setDefaultResultOrder('ipv4first');
 
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 const express  = require('express');
 const cors     = require('cors');
@@ -15,6 +15,8 @@ const bcrypt   = require('bcryptjs');
 const { db }   = require('./db');
 const { router: authRouter }  = require('./routes/auth');
 const { router: adminRouter } = require('./routes/admin');
+const { router: stripeRouter, webhookHandler } = require('./routes/stripe');
+const { router: interviewRouter } = require('./routes/interview');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -39,6 +41,9 @@ app.use(cors(function(req, callback) {
   callback(null, { origin: allowed, credentials: true });
 }));
 
+// Stripe webhook needs raw body — must be registered BEFORE express.json()
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), webhookHandler);
+
 app.use(express.json());
 
 // Basic request logger
@@ -48,8 +53,10 @@ app.use((req, _res, next) => {
 });
 
 // ── Routes ─────────────────────────────────────────────────
-app.use('/api/auth',  authRouter);
-app.use('/api/admin', adminRouter);
+app.use('/api/auth',   authRouter);
+app.use('/api/admin',  adminRouter);
+app.use('/api/stripe',    stripeRouter);
+app.use('/api/interview', interviewRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });

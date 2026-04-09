@@ -237,6 +237,52 @@ router.post('/subscription', authMiddleware, async (req, res) => {
   res.json({ credits: updated.credits, subscription: sub });
 });
 
+// ── GET /api/auth/coupon/:code ────────────────────────────
+router.get('/coupon/:code', authMiddleware, async (req, res) => {
+  try {
+    await db.createCouponsTable();
+    const coupon = await db.getCouponByCode(req.params.code);
+    if (!coupon) return res.status(404).json({ error: 'Invalid coupon code' });
+    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+      return res.status(400).json({ error: 'This coupon has expired' });
+    }
+    res.json({ code: coupon.code, days: coupon.days });
+  } catch (err) {
+    console.error('Coupon validate error:', err);
+    res.status(500).json({ error: 'Failed to validate coupon' });
+  }
+});
+
+// ── POST /api/auth/coupon/apply ───────────────────────────
+router.post('/coupon/apply', authMiddleware, async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: 'Coupon code is required' });
+    await db.createCouponsTable();
+    const coupon = await db.getCouponByCode(code);
+    if (!coupon) return res.status(404).json({ error: 'Invalid coupon code' });
+    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+      return res.status(400).json({ error: 'This coupon has expired' });
+    }
+    const user = await db.findById(req.userId);
+    let existing = null;
+    try { existing = user.subscription ? JSON.parse(user.subscription) : null; } catch {}
+    // Extend from today, or from end of existing active subscription
+    const baseDate = (existing && new Date(existing.expiresAt) > new Date())
+      ? new Date(existing.expiresAt)
+      : new Date();
+    const expiresAt = new Date(baseDate);
+    expiresAt.setDate(expiresAt.getDate() + coupon.days);
+    const sub = { plan: 'coupon', couponCode: coupon.code, startedAt: new Date().toISOString(), expiresAt: expiresAt.toISOString() };
+    await db.setSubscription(JSON.stringify(sub), req.userId);
+    await db.incrementCouponUsed(coupon.code);
+    res.json({ message: `Coupon applied! You have ${coupon.days} free day${coupon.days !== 1 ? 's' : ''} of access.`, days: coupon.days, expiresAt: expiresAt.toISOString() });
+  } catch (err) {
+    console.error('Coupon apply error:', err);
+    res.status(500).json({ error: 'Failed to apply coupon' });
+  }
+});
+
 // ── POST /api/auth/progress ───────────────────────────────
 router.post('/progress', authMiddleware, async (req, res) => {
   const { course, module, lesson } = req.body;

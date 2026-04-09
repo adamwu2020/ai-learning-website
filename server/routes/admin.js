@@ -151,4 +151,58 @@ router.post('/users/:id/reset-password', adminMiddleware, async (req, res) => {
   }
 });
 
+// ── GET /api/admin/coupons ────────────────────────────────
+router.get('/coupons', adminMiddleware, async (_req, res) => {
+  try {
+    await db.createCouponsTable();
+    const coupons = await db.getCoupons();
+    res.json({ coupons });
+  } catch (err) {
+    console.error('List coupons error:', err);
+    res.status(500).json({ error: 'Failed to list coupons' });
+  }
+});
+
+// ── POST /api/admin/coupons ───────────────────────────────
+router.post('/coupons', adminMiddleware, async (req, res) => {
+  try {
+    const { code, days, expires_at } = req.body;
+    if (!code || !code.trim()) return res.status(400).json({ error: 'Code is required' });
+    if (!days || days < 1 || days > 10000) return res.status(400).json({ error: 'Days must be between 1 and 10000' });
+    await db.createCouponsTable();
+    const existing = await db.getCouponByCode(code.trim());
+    if (existing) return res.status(409).json({ error: 'A coupon with that code already exists' });
+    const coupon = await db.createCoupon(code.trim(), days, expires_at || null);
+    res.status(201).json({ coupon });
+  } catch (err) {
+    console.error('Create coupon error:', err);
+    res.status(500).json({ error: 'Failed to create coupon' });
+  }
+});
+
+// ── PUT /api/admin/coupons/:id ────────────────────────────
+router.put('/coupons/:id', adminMiddleware, async (req, res) => {
+  try {
+    const { days, expires_at } = req.body;
+    if (!days || days < 1 || days > 10000) return res.status(400).json({ error: 'Days must be between 1 and 10000' });
+    const coupon = await db.updateCoupon(req.params.id, days, expires_at || null);
+    if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
+    res.json({ coupon });
+  } catch (err) {
+    console.error('Update coupon error:', err);
+    res.status(500).json({ error: 'Failed to update coupon' });
+  }
+});
+
+// ── DELETE /api/admin/coupons/:id ─────────────────────────
+router.delete('/coupons/:id', adminMiddleware, async (req, res) => {
+  try {
+    await db.deleteCoupon(req.params.id);
+    res.json({ message: 'Coupon deleted' });
+  } catch (err) {
+    console.error('Delete coupon error:', err);
+    res.status(500).json({ error: 'Failed to delete coupon' });
+  }
+});
+
 module.exports = { router };

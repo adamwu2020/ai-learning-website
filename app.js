@@ -164,16 +164,18 @@ function buildSidebar() {
     item.addEventListener('click', () => navigate(m.id));
     sidebar.appendChild(item);
 
-    const browseItem = document.createElement('div');
-    browseItem.className = 'nav-item';
-    browseItem.style.paddingLeft = '48px';
-    browseItem.innerHTML = `<div style="font-size:12.5px;color:#475569">📚 Browse Q&A</div>`;
-    browseItem.addEventListener('click', () => {
-      navigate('interview');
-      if (typeof renderQuestionBrowser === 'function') renderQuestionBrowser('all');
-      setIvTab('browse');
-    });
-    sidebar.appendChild(browseItem);
+    if (typeof currentUser !== 'undefined' && currentUser?.is_admin) {
+      const browseItem = document.createElement('div');
+      browseItem.className = 'nav-item';
+      browseItem.style.paddingLeft = '48px';
+      browseItem.innerHTML = `<div style="font-size:12.5px;color:#475569">📚 Browse Q&A</div>`;
+      browseItem.addEventListener('click', () => {
+        navigate('interview');
+        if (typeof renderQuestionBrowser === 'function') renderQuestionBrowser('all');
+        setIvTab('browse');
+      });
+      sidebar.appendChild(browseItem);
+    }
   });
 }
 
@@ -226,6 +228,10 @@ document.addEventListener('click', (e) => {
 
 // ── Interview Tab Toggle ───────────────────────────────────
 function setIvTab(name) {
+  // Question Bank is admin-only — redirect non-admins to practice tab
+  if (name === 'browse' && !(typeof currentUser !== 'undefined' && currentUser?.is_admin)) {
+    name = 'practice';
+  }
   document.querySelectorAll('.iv-tab-btn').forEach(b => {
     b.classList.toggle('iv-tab-active', b.textContent.toLowerCase().includes(
       name === 'practice' ? 'practice' : 'question'
@@ -233,6 +239,14 @@ function setIvTab(name) {
   });
   if (name === 'browse' && typeof renderQuestionBrowser === 'function') renderQuestionBrowser('all');
   else if (typeof renderInterviewSetup === 'function') renderInterviewSetup();
+}
+
+// ── Show/hide Question Bank tab based on admin status ────────
+function updateQuestionBankVisibility() {
+  const tab = document.getElementById('question-bank-tab');
+  if (!tab) return;
+  const isAdmin = typeof currentUser !== 'undefined' && currentUser?.is_admin;
+  tab.style.display = isAdmin ? '' : 'none';
 }
 
 // ── Init ───────────────────────────────────────────────────

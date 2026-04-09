@@ -283,7 +283,7 @@
         <div class="lp-section-inner">
           <div class="lp-section-label">PRICING</div>
           <h2 class="lp-section-title">Simple, Transparent Pricing</h2>
-          <p class="lp-section-sub">All course content is free. Pay only for mock interview sessions.</p>
+          <p class="lp-section-sub">All course content is free. Subscribe for mock interview access.</p>
           <div class="lp-pricing-grid">
 
             <div class="lp-price-card">
@@ -296,40 +296,40 @@
                 <li>✓ 40+ Python code examples</li>
                 <li>✓ Architecture diagrams</li>
                 <li>✓ Progress tracking</li>
-                <li>✓ Browse Q&amp;A bank</li>
+                <li>✓ Have a coupon? Free trial</li>
               </ul>
               <button class="lp-btn-outline" onclick="openAuthModal('register')">Get Started</button>
             </div>
 
-            <div class="lp-price-card lp-price-featured">
-              <div class="lp-pc-badge">Most Popular</div>
-              <div class="lp-pc-icon">🎯</div>
-              <div class="lp-pc-name">Interview Credits</div>
-              <div class="lp-pc-price"><span class="lp-price-big">$1</span><span class="lp-price-unit">/credit</span></div>
-              <div class="lp-pc-desc">1 interview = 50 credits</div>
-              <ul class="lp-pc-features">
-                <li>✓ 10-question mock sessions</li>
-                <li>✓ Model answer comparisons</li>
-                <li>✓ Difficulty selection</li>
-                <li>✓ Session history</li>
-                <li>✓ Credits never expire</li>
-              </ul>
-              <button class="lp-btn-primary" onclick="openAuthModal('register')">Buy Credits</button>
-            </div>
-
             <div class="lp-price-card">
-              <div class="lp-pc-icon">⚡</div>
+              <div class="lp-pc-icon">📅</div>
               <div class="lp-pc-name">Pro Monthly</div>
               <div class="lp-pc-price"><span class="lp-price-big">$99</span><span class="lp-price-unit">/mo</span></div>
               <div class="lp-pc-desc">200 credits · 30 days</div>
               <ul class="lp-pc-features">
-                <li>✓ 200 credits monthly</li>
+                <li>✓ 200 credits/month</li>
                 <li>✓ 4 mock interviews/month</li>
-                <li>✓ All free features</li>
+                <li>✓ All course modules</li>
                 <li>✓ Priority support</li>
-                <li>✓ Best value for job prep</li>
+                <li>✓ Cancel anytime</li>
               </ul>
-              <button class="lp-btn-outline" onclick="openAuthModal('register')">Go Pro</button>
+              <button class="lp-btn-outline" onclick="openAuthModal('register')">Go Monthly</button>
+            </div>
+
+            <div class="lp-price-card lp-price-featured">
+              <div class="lp-pc-badge">Best Value</div>
+              <div class="lp-pc-icon">🗓️</div>
+              <div class="lp-pc-name">Pro Annual</div>
+              <div class="lp-pc-price"><span class="lp-price-big">$999</span><span class="lp-price-unit">/yr</span></div>
+              <div class="lp-pc-desc">2,400 credits · 365 days · 2 months free</div>
+              <ul class="lp-pc-features">
+                <li>✓ 2,400 credits/year</li>
+                <li>✓ 48 mock interviews/year</li>
+                <li>✓ All course modules</li>
+                <li>✓ Priority support</li>
+                <li>✓ Save ~$189 vs monthly</li>
+              </ul>
+              <button class="lp-btn-primary" onclick="openAuthModal('register')">Go Annual</button>
             </div>
 
           </div>
@@ -2652,7 +2652,7 @@ print(result["critique"])</code></pre>
     <section id="interview" class="section">
       <div class="iv-topbar">
         <button class="iv-tab-btn iv-tab-active" onclick="setIvTab('practice')">🎯 Practice</button>
-        <button class="iv-tab-btn" onclick="setIvTab('browse')">📚 Question Bank</button>
+        <button class="iv-tab-btn" id="question-bank-tab" onclick="setIvTab('browse')" style="display:none">📚 Question Bank</button>
       </div>
       <div id="interview-content"></div>
     </section>

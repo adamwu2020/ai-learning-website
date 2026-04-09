@@ -2,7 +2,11 @@
 //  Auth Client — Register, Login, Forgot Password
 // ============================================================
 
-const API = '/api';
+// In production the server serves the frontend, so /api is relative.
+// In local dev (Live Server on 5500, server on 3001) we need the full URL.
+const API = (location.hostname === 'localhost' && location.port === '5500')
+  ? 'http://localhost:3001/api'
+  : '/api';
 const TOKEN_KEY = 'ai-learn-token';
 
 // ── State ──────────────────────────────────────────────────
@@ -55,6 +59,7 @@ async function initAuth() {
     await syncCreditsFromServer();
     renderTopbarUser(user);
     enterApp();
+    if (typeof updateQuestionBankVisibility === 'function') updateQuestionBankVisibility();
   } catch {
     localStorage.removeItem(TOKEN_KEY);
     renderTopbarGuest();
@@ -80,6 +85,7 @@ function logout() {
   updateCreditDisplay();
   closeAuthModal();
   exitApp();
+  if (typeof updateQuestionBankVisibility === 'function') updateQuestionBankVisibility();
 }
 
 // ── Server-aware credit operations ─────────────────────────
@@ -288,6 +294,7 @@ async function handleLogin(e) {
     renderTopbarUser(user);
     closeAuthModal();
     enterApp();
+    if (typeof updateQuestionBankVisibility === 'function') updateQuestionBankVisibility();
     showToast(`Welcome back, ${user.name.split(' ')[0]}! 👋`);
   } catch (err) {
     showAuthError(errEl, err.message);
@@ -366,6 +373,7 @@ async function handleRegister(e) {
     renderTopbarUser(user);
     closeAuthModal();
     enterApp();
+    if (typeof updateQuestionBankVisibility === 'function') updateQuestionBankVisibility();
     showToast(`Account created! Welcome, ${user.name.split(' ')[0]}! 🎉`);
   } catch (err) {
     showAuthError(errEl, err.message);
